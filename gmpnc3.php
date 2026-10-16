@@ -1,0 +1,493 @@
+       <link rel="stylesheet" href="dist-assets/css/plugins/smart.wizard/smart_wizard.min.css" />
+    <link rel="stylesheet" href="dist-assets/css/plugins/smart.wizard/smart_wizard_theme_arrows.min.css" />
+    <link rel="stylesheet" href="dist-assets/css/plugins/smart.wizard/smart_wizard_theme_circles.min.css" />
+    <link rel="stylesheet" href="dist-assets/css/plugins/smart.wizard/smart_wizard_theme_dots.min.css" />
+
+
+<div class="main-content">
+                <div class="breadcrumb">
+                    <h1 class="mr-2"><?php echo $headingname;?></h1>
+                    <ul>
+                        <li><a href="">Audit Management</a></li>
+                        <li>View Detail</li>
+                    </ul>
+                </div>
+				
+		
+												
+												
+				
+			 <div class="row mb-12">
+                    <div class="col-md-12 mb-12">
+                        <div class="card text-left">
+                            <div class="card-body">
+							
+								
+			<?php
+			
+				$sno=$_GET['sno'];
+				$query=mysqli_query($con,"select * from tblgmpaudit3 where id='$sno'");
+				$query1=mysqli_fetch_array($query);
+				
+				$rid=$_GET['sno1'];
+				
+				$sql=mysqli_query($con,"select * from tblgmpaudit2 where id='$rid'");
+				$row=mysqli_fetch_array($sql);
+			
+				
+				
+											    $sh=mysqli_query($con,"select * from tblauditor where id='$row[auditor]'");
+                                                $hj=mysqli_fetch_array($sh);
+												?>
+
+											  <?php
+											    $sh13=mysqli_query($con,"select * from tblauditee where id='$row[auditee]'");
+                                                $hj13=mysqli_fetch_array($sh13);
+												
+												
+												
+												 $total3=mysqli_query($con,"select * FROM tblauditsection where id='$row[audit]'");
+				  $addtest=mysqli_fetch_array($total3);
+				  
+				  
+				   $total2=mysqli_query($con,"select * FROM tblauditsection1 where sid='$row[audit]' and id='$row[sid]'");
+				   $subtest=mysqli_fetch_array($total2);
+				   
+				   
+				   
+												?> 
+												
+												
+				
+		
+							
+                             <h4 class="card-title mb-3" style="color:#FF0000" align="center">Review before submit </h4>
+								
+                           
+								 <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="card card-profile-1 mb-4">
+                                            <div class="card-body text-center">
+                                                <div ><img src="auditordoc/<?php echo $hj['userimg'];?>" alt="" width="70" /></div>
+                                              
+											   <button class="btn btn-primary btn-rounded"> Auditor: <?php echo $hj['name'];?></button>
+                                                <p class="mt-0">Contact: <?php echo $hj['contact'];?></p>
+                                                <p>Email: <?php echo $hj['email'];?></p>
+                                               
+                                            </div>
+                                        </div>
+                                   
+                                             <div class="card card-profile-1 mb-4">
+                                              <div class="card-body text-center">
+                                                <div >
+												<img src="auditordoc/<?php echo $hj13['img'];?>" alt=""  width="70" />
+												</div>
+                                              
+											   <button class="btn btn-primary btn-rounded"> Auditee: <?php echo $hj13['name'];?></button>
+                                                <p class="mt-0">Contact: <?php echo $hj13['contact'];?></p>
+                                                <p>Email: <?php echo $hj13['email'];?></p>
+												
+                                               
+                                               
+                                            </div>
+                                        </div>
+                                    </div>
+									
+									<?php
+											    $sh4=mysqli_query($con,"select * from tblgmpaudit3 where id='$sno'");
+                                                $hj4=mysqli_fetch_array($sh4);
+												$mch=mysqli_num_rows($sh4);
+												if($mch<=0)
+												{}
+												else
+												{
+												?> 
+												
+									<div class="col-md-8">
+									 <div class="card card-profile-1 mb-8">
+								  <div class="table-responsive">
+                                    <table class="display table table-striped table-bordered" id="zero_configuration_table" style="width:100%">
+									<tr><th><?php echo $addtest['name'];?> </th></tr>
+									<tr><th><?php echo $subtest['name'];?> </th></tr>
+									<tr><td>Audit date: <?php echo date("d-m-Y", strtotime($row['date']));?> </td></tr>
+									
+									
+									<?php
+									if($hj4['deliver']!="0000-00-00" || $hj4['deliver']!="")
+									{
+									?>
+									
+									<tr><td> Completion date agreed: <?php echo date("d-m-Y", strtotime($hj4['deliver']));?> </td></tr>
+									<?php
+									}
+									?>
+									<tr><td>Comment: <?php echo $hj4['cmnt'];?> </td></tr>
+									<tr><td>Action Required: <?php echo $hj4['action'];?> </td></tr>
+									
+									<?php
+									if($hj4['img']!="")
+									{
+									?>
+									<tr>
+									<td>Document: &nbsp;
+									<?php
+									$string = $hj4['img'];
+$tags1 = explode(';' , $string);
+$i=0;
+foreach($tags1 as $key1)
+  {
+  $i++;
+   $info5= new SplFileInfo($key1);
+  $tpe5=$info5->getExtension();
+  if($tpe5!="")
+  {
+  ?>
+												<a href="auditpic/<?php echo $key1;?>" target="_blank" style="color:#0033FF"><?php echo $key1;?></a>
+												
+												<br/>
+												<?php
+												}
+												}
+												?>
+												
+									</td>
+												</tr>
+												<?php
+												}
+												?>
+												
+												
+												
+												<?php
+												 $sh6=mysqli_query($con,"select * from tblaction1 where sno='$sno' and status1='done'");
+                                               while($hj6=mysqli_fetch_array($sh6))
+												{
+												$string1 = $hj6['comment'];
+   $array1 = explode(";", $string1);
+												?>
+												<tr><td><h5 style="color:#993300">Auditee Response:</h5></td></tr>
+						 <tr><td>Root Cause: <br/><?php echo $array1[0];?><br/><?php echo $array1[1];?><br/><?php echo $array1[2];?><br/><?php echo $array1[3];?><br/><?php echo $array1[4];?> </td></tr>
+						 
+						  <tr><td>Corrective Action: <?php echo $hj6['corrective'];?></td></tr>
+												
+						 <tr><td>Document:  <a href="auditpic/<?php echo $hj6['img'];?>" style="color:#0000FF" target="_blank"><?php echo $hj6['img'];?></a></td></tr>
+						 
+						 <?php
+												 $sh61=mysqli_query($con,"select * from tblaction1 where sno='$sno' and status2='done'");
+                                               while($hj61=mysqli_fetch_array($sh61))
+												{
+												?>
+						 <tr><td><h5 style="color:#993300">Auditor Response:</h5></td></tr>
+						 
+						 <tr><td>Status: <?php echo $hj61['ans'];?></td></tr>
+						 
+						 <tr><td>Auditor Comment: <?php echo $hj61['cmnt'];?></td></tr>
+												<?php
+												}
+												?>
+						 
+									<?php
+									}
+									?>
+												
+												
+									</table>
+									</div>
+									</div>
+									</div>
+									
+									
+									</div>
+									
+									<?php
+			
+				$rtsw=mysqli_query($con,"select * from tblaction1 where id='$_GET[snid]' and status1!='done' ");
+				$rtsw1=mysqli_fetch_array($rtsw);
+				
+			$string = $rtsw1['comment'];
+   $array = explode(";", $string);
+				?>
+				
+				
+				<?php
+												if( $hj4['status']=="Rejected" && $access=="Auditee") 
+												{
+												?>
+								 <div class="breadcrumb">
+                    
+                    <ul>
+                       
+                        <li>| Give your response</li>
+                    </ul>
+                </div>
+                
+				
+                    
+			
+                <div class="row">
+                    <div class="col-md-12">
+                        <!--  SmartWizard html -->
+                       <form name="form3" action="" method="post" class="pt-3" enctype="multipart/form-data">
+					     <input type="hidden" class="form-control" name="imgg" value="<?php echo $rtsw1['img'];?>">
+						 
+								 <table class="display table table-striped table-bordered" id="zero_configuration_table" style="width:100%">
+									<tr><td>Comment: <textarea class="form-control" name="rt" required><?php echo $rtsw1['comment'];?></textarea></td></tr>
+									<tr><td>Upload Document: <a href="auditpic/<?php echo $rtsw1['img'];?>" target="_blank"><?php echo $rtsw1['img'];?>
+									 <input type="file" class="form-control" name="img1"></td></tr>
+									<tr><td><button type="submit" class="btn btn-info" name="submit3">Submit</button></td></tr>
+									</table>
+									</form>
+			   
+			   
+			   <?php
+			   }
+			   ?>
+				
+									<?php
+												if($hj4['status']=="Waiting" && $access=="Auditee") 
+												{
+												?>
+								 <div class="breadcrumb">
+                    <h1>Root Cause Analysis</h1>
+                    <ul>
+                       
+                        <li>| Give your response</li>
+                    </ul>
+                </div>
+                
+				
+                    
+				<form name="form1" action="" method="post" class="pt-3" enctype="multipart/form-data">
+						
+                <div class="row">
+                    <div class="col-md-12">
+                        <!--  SmartWizard html -->
+                        <div id="smartwizard">
+                            <ul>
+                                <li><a href="#step-1">Step 1<br /><small>Question 1 why?</small></a></li>
+                                <li><a href="#step-2">Step 2<br /><small>Question 2 why?</small></a></li>
+                                <li><a href="#step-3">Step 3<br /><small>Question 3 why?</small></a></li>
+                                <li><a href="#step-4">Step 4<br /><small>Question 4 why?</small></a></li>
+								<li><a href="#step-5">Step 5<br /><small>Question 5 why?</small></a></li>
+								<li><a href="#step-6">Concluded<br /><small></small></a></li>
+                            </ul>
+                            <div>
+							
+                                <div id="step-1">
+                                    <h3 class="border-bottom border-gray pb-2">
+									<textarea class="form-control" name="root1" placeholder="Explain Why?" required><?php echo $array[0];?></textarea>
+                                </div>
+                                <div id="step-2">
+                                
+                                    <div><textarea class="form-control" name="root2" placeholder="Explain Why?" required><?php echo $array[1];?></textarea></div>
+                                </div>
+                                <div id="step-3">
+                                   <textarea class="form-control" name="root3" placeholder="Explain Why?"><?php echo $array[2];?></textarea>
+                                </div>
+                                <div id="step-4">
+                                        <textarea class="form-control" name="root4" placeholder="Explain Why?"><?php echo $array[3];?></textarea>
+                              
+                            </div>
+							
+							<div id="step-5">
+                                        <textarea class="form-control" name="root5" placeholder="Explain Why?"><?php echo $array[4];?></textarea>
+                              
+                            </div>
+							
+							
+							<div id="step-6">
+                                    <h5> Corrective Action</h5>
+                                    <textarea class="form-control" name="corrective" required><?php echo $rtsw1['corrective'];?></textarea>
+									<br/>
+									
+									 <h5 >Upload Document: <a href="auditpic/<?php echo $rtsw1['img'];?>" target="_blank"><?php echo $rtsw1['img'];?></a></h5>
+									  <input type="hidden" class="form-control" name="imgg" value="<?php echo $rtsw1['img'];?>">
+									  
+                                   <input type="file" class="form-control" name="img">
+                             
+                            </div>
+                        </div>
+                    </div>
+					
+               </form>
+           <script language="javascript">
+		   "use strict";
+
+$(document).ready(function () {
+  // Step show event
+  $("#smartwizard").on("showStep", function (e, anchorObject, stepNumber, stepDirection, stepPosition)
+   {
+ $("#Button").addClass('disabled');
+      $("#Button1").addClass('disabled');
+ 
+	
+	if(stepNumber>="2")
+	{
+	 $("#Button").removeClass('disabled');
+    $("#Button1").removeClass('disabled');
+	}
+	
+    if (stepPosition === 'first')
+	 {
+	  
+      $("#prev-btn").addClass('disabled');
+    } 
+	else if (stepPosition === 'final') 
+	{
+	$("#Button").removeClass('disabled');
+    $("#Button1").removeClass('disabled');
+   
+      $("#next-btn").addClass('disabled');
+    } 
+	else
+	 {
+	
+	
+      $("#prev-btn").removeClass('disabled');
+      $("#next-btn").removeClass('disabled');
+    }
+  }); // Toolbar extra buttons
+
+  var btnFinish = $('<button type="button" name="dS" id="Button"  ></button>').text('Concluded').addClass('btn btn-info').on('click', function () 
+ {
+  window.open('#step-6','_self');
+  });
+  var btnCancel = $('<button type="submit" name="submit" id="Button1"></button>').text('Submit').addClass('btn btn-danger').on('click', function () 
+  {
+   // $('#smartwizard').smartWizard("reset");
+  }); // Smart Wizard
+
+  $('#smartwizard').smartWizard({
+    selected: 0,
+    theme: 'default',
+    transitionEffect: 'fade',
+    showStepURLhash: true,
+    toolbarSettings: {
+     
+      toolbarButtonPosition: 'end',
+      toolbarExtraButtons: [btnFinish, btnCancel]
+    }
+  }); // External Button Events
+
+  $("#reset-btn").on("click", function () {
+    // Reset wizard
+    $('#smartwizard').smartWizard("reset");
+    return true;
+  });
+  $("#prev-btn").on("click", function () {
+    // Navigate previous
+    $('#smartwizard').smartWizard("prev");
+    return true;
+  });
+  $("#next-btn").on("click", function () {
+    // Navigate next
+    $('#smartwizard').smartWizard("next");
+    return true;
+  });
+  $("#theme_selector").on("change", function () {
+    // Change theme
+    $('#smartwizard').smartWizard("theme", $(this).val());
+    return true;
+  }); // Set selected theme on page refresh
+
+  $("#theme_selector").change();
+});</script>
+									<?php
+									}
+									?>
+									
+									
+									
+                               </div></div></div></div>
+							   
+							   
+							     <?php
+							   if(isset($_POST['submit']))
+							   {
+							   $user=$_SESSION['user'];
+							   $sn=$_GET['sno'];
+							   $cmnt=$_POST['root1'].";".$_POST['root2'].";".$_POST['root3'].";".$_POST['root4'].";".$_POST['root5'].";";
+							   $rt=mysqli_real_escape_string($con,$cmnt);
+							   $corrective=mysqli_real_escape_string($con,$_POST['corrective']);
+							   
+							   if($_FILES['img']['name']=="")
+							   {
+							    $img=$_POST['imgg'];
+							   }
+							   else
+							   {
+							   $img=$sn.$_FILES['img']['name'];
+							   move_uploaded_file($_FILES['img']['tmp_name'],'auditpic/'.$img);
+							   }
+							   
+							   $date=date("Y-m-d");
+							   
+							   $ghjkl=mysqli_query($con,"update tblaction1 set comment='$rt',date='$date',user='$user',img='$img',corrective='$corrective',status1='done' where id='$_GET[snid]'");
+							   
+							   
+							   
+							 
+							 $jk=mysqli_query($con,"update tblgmpaudit3 set status='closedoff' where id='$_GET[sno]'");
+
+							 
+							   //$jk1=mysqli_query($con,"update tblroster set status1='closedoff' where sno='$_GET[sno1]'");
+							   ?>
+							   <script language="javascript">
+							   window.open('gmpclose.php?sno=<?php echo $_GET['sno'];?>&sno1=<?php echo $_GET['sno1'];?>','_self');
+							   </script>
+							    
+				                 <?php
+				                  }
+				                  ?>
+								  
+								  
+								  
+								  <?php
+							   if(isset($_POST['submit3']))
+							   {
+							   $user=$_SESSION['user'];
+							   $sn=$_GET['sno'];
+							   $cmnt=$_POST['rt'];
+							   $rt=mysqli_real_escape_string($con,$cmnt);
+							   
+							   
+							   if($_FILES['img']['name']=="")
+							   {
+							    $img=$_POST['imgg'];
+							   }
+							   else
+							   {
+							   $img=$sn.$_FILES['img']['name'];
+							   move_uploaded_file($_FILES['img']['tmp_name'],'auditpic/'.$img);
+							   }
+							   
+							   $date=date("Y-m-d");
+							   
+							   
+							   $ghjkl=mysqli_query($con,"update tblaction1 set comment='$rt',date='$date',user='$user',img='$img' status1='done' where id='$_GET[snid]'");
+							   
+							   
+							   
+							    $jk=mysqli_query($con,"update tblgmpaudit3 set status='closedoff' where id='$_GET[sno]'");
+								
+								
+							   //$jk1=mysqli_query($con,"update tblroster set status1='closedoff' where sno='$_GET[sno1]'");
+							   
+							   ?>
+							   <script language="javascript">
+							   window.open('gmpclose.php?sno=<?php echo $_GET['sno'];?>&sno1=<?php echo $_GET['sno1'];?>','_self');
+							   </script>
+							    
+				                 <?php
+				                  }
+				                  ?>
+								  
+								  
+								  
+								
+								  <?php
+								  }
+								  ?>
+								  
+								  
+							

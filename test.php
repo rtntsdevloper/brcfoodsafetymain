@@ -1,0 +1,43 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="description" content="Simple barcode generation demo.">
+  <title>Barcode</title>
+  <script type="text/javascript" src="barcode.js"></script>
+  <script type="text/javascript">
+	function barcode() { 
+		var text = unescape(encodeURIComponent(form.text.value)); // unicode chars to utf-8
+		
+		// DataMatrix in SVG
+		path.setAttribute('d',toPath(datamatrix(text))); // matrix as svg path
+		svg.setAttribute('style','height:'+svg.getBBox().height+'px'); // scale height
+		
+		// QRCode in GIF
+		gif.src = toGif(quickresponse(text),6); // matrix as gif
+		
+		// Aztec in canvas
+		var ctx = canvas.getContext('2d'), mat = aztec(text);
+		canvas.height = mat.length*6; ctx.scale(6,6); // scale height
+		ctx.fill(new Path2D(toPath(mat))); // matrix as canvas
+
+		// PDF417 in HTML/CSS
+		pdf.innerHTML = toHtml(pdf417(text),[4,10]); // matrix as HTML/CSS
+		
+		// Code128 in HTML/CSS
+		c128.innerHTML = toHtml([code128(text)],[3,60]); // array to matrix for toHtml
+	}
+  </script>  
+</head>
+<body onLoad="barcode()">
+	<h1>Easy Barcode Generation</h1>
+	
+	<p>Check this page source to see how simple barcode generation is!</p>
+
+	<h3>Message to encode:</h3>
+	<form name="form">
+	  <p><textarea name="text" cols="60" rows="6" title="type barcode text here" onKeyUp="barcode()">TYPE TEXT HERE</textarea></p>
+	</form>
+
+	<h2>Data Matrix</h2>
+	as SVG: <svg id="svg"><path id="path" transform="scale(6)" /></svg>

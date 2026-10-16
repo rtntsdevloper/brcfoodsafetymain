@@ -1,0 +1,8 @@
+# RTNTS FSC Portal — Apache settings for shared hosting (cPanel)
+DirectoryIndex login.php index.php
+Options -Indexes
+
+# Send visitors to login by default; protect session cookies
+<IfModule mod_php.c>
+  php_flag session.cookie_httponly On
+</IfModule>

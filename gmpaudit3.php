@@ -1,0 +1,4 @@
+<script language="javascript">
+window.open('','_self');
+
+</script>

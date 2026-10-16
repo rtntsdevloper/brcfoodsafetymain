@@ -1,0 +1,2 @@
+[12-Feb-2015 03:53:44 Europe/London] PHP Fatal error:  Class 'PHPExcel_RichText_Run' not found in /home5/hbsupply/public_html/reports/PHPExcel1/Classes/PHPExcel/RichText.php on line 106
+[12-Feb-2015 03:56:23 Europe/London] PHP Fatal error:  Class 'PHPExcel_RichText_Run' not found in /home5/hbsupply/public_html/reports/PHPExcel1/Classes/PHPExcel/RichText.php on line 106

@@ -1,0 +1,316 @@
+// Change this as needed
+$max-items: 5;
+
+$palette: (
+  label-inactive: #999,
+  label-active:   #666,
+  track-inactive: #ccc,
+  track-active:   #f00    
+);
+
+$dimensions: (
+  track-wh: 4px,
+  point-wh: 14px
+);
+
+$breakpoints: (
+  small:  320px,
+  med:    640px,
+  large:  980px
+);
+  
+@mixin mq($break:med) {
+  $_d: map-get($breakpoints, $break);
+  $_b: if($_d, $_d, $break);
+
+  @media only screen and (min-width: $_b) {
+    @content;
+  }
+}
+
+@mixin label(
+  $radius:   5px, 
+  $arrow-wh: 5px,
+  $tint:     #ccc
+  ) {  
+  padding:                5px 10px;
+  border-radius:          $radius;
+  border-top-left-radius: 0;
+  background:             $tint;
+  
+  @include mq {
+    border-top-left-radius: $radius;
+    text-align:             center;
+  }
+  
+  &:after {
+    transition:  0.5s border-color;
+    
+    content:            '';
+    display:            block;
+    position:           absolute;
+    top:                0;
+    right:              100%;
+    margin-right:       -$arrow-wh;
+    border:             $arrow-wh solid transparent;
+    border-top-color:   $tint;
+    
+    @include mq {
+      top:                 auto;
+      left:                50%;
+      bottom:              100%;
+      right:               auto;
+      margin-left:         -$arrow-wh;
+      margin-right:        0;
+      border-color:        transparent;
+      border-bottom-color: $tint;
+    }
+  }
+}
+
+%progress__point {
+  $_wh: map-get($dimensions, 'point-wh');
+  $_xy: $_wh * -0.5;
+
+  transition: 0.5s color;
+  position:   relative;
+  cursor:     pointer;
+  background: transparent;
+
+  &:before, 
+  &:after {      
+    content:    '';
+    display:    block;
+    width:      $_wh;
+    height:     $_wh;
+    text-align: center;
+  }
+
+  &:before {
+    transition: 0.5s background;
+
+    margin:        $_xy $_xy 0;
+    border-radius: $_wh;
+    box-shadow:    0 0 0 3px #ccc;
+    background:    #fff;
+  }
+
+  &:after {
+    content:     "\2713";
+    position:    absolute;
+    left:        0;
+    top:         0;
+    width:       $_wh;
+    height:      $_wh;
+    margin:      $_xy $_xy;
+    line-height: $_wh;
+    color:       #fff;
+  }
+}
+
+%progress__point__label {
+  $_y: map-get($dimensions, 'point-wh') / 2;
+  
+  @include label($arrow-wh: 5px, $tint: #eee);
+  
+  transition: 0.5s background;
+  
+  position:   absolute;
+  width:      100px;
+  margin:     -$_y 0 0 20px;
+  font-style: normal;
+  
+  @include mq {
+    margin: 10px 0 0 -50px;
+  }
+  
+  &:before {
+    // Display the counter + non-breaking space
+    counter-increment: point;
+    content:           counter(point) ".\00A0";
+  }
+}
+
+.progress {
+  $_wh: map-get($dimensions, 'track-wh');
+  
+  counter-reset: point;
+  
+  display:         flex;
+  justify-content: space-between;
+  flex-direction:  column;
+  flex:            1 0;
+  
+  position:   relative;
+  margin:     auto;
+  padding:    0;
+  list-style: none;
+  color:      map-get($palette, 'label-inactive');
+  
+  @include mq {
+    flex-direction:  row;
+    
+    width: 80%;
+  }
+
+  &:before,
+  &:after {    
+    content:    '';
+    display:    block;
+    position:   absolute;
+    left:       $_wh * -0.5;
+    top:        0;    
+    z-index:    -1;
+    
+    @include mq {
+      left:   0;
+      top:    $_wh * -0.5;
+      height: $_wh;
+    }
+  }
+  
+  &:before {    
+    width:      $_wh;
+    height:     100%;
+    background: map-get($palette, 'track-inactive');
+    
+    @include mq {
+      width:  100%;
+      height: $_wh;
+    }
+  }
+  
+  &:after {
+    transition: 0.5s height;
+    width:      $_wh;
+    background: map-get($palette, 'track-active');
+    
+    @include mq {
+      transition-property: width;
+    }
+  }
+    
+  > li {
+    @extend %progress__point;
+    
+    > i {
+      @extend %progress__point__label;
+    }
+  }
+}
+
+%step-active {
+  $_tint-text: map-get($palette, 'label-active');
+  
+  color: $_tint-text;
+
+  &:before {
+    box-shadow: 0 0 0 3px $_tint-text, 0 0 0 5px #fff;
+  }
+}
+
+%step-visited {
+  &:before {
+    background: map-get($palette, 'label-active');
+  }
+}
+
+%step-current {
+  $_tint-bg: map-get($palette, 'track-inactive');
+
+  > i {
+    background: $_tint-bg;
+
+    &:after {
+      border-top-color: $_tint-bg;
+
+      @include mq {
+        border-color:        transparent;
+        border-bottom-color: $_tint-bg;
+      }
+    }
+  }
+}
+
+// Dynamically create styles
+$steps: $max-items - 1;
+
+@for $i from 0 to $max-items {
+  $_perc:      $i / $steps * 100;
+
+  .progress[data-progress='#{$i}'] {
+    &:after {
+      height: #{$_perc + '%'};
+
+      @include mq {
+        height: map-get($dimensions, 'track-wh');
+        width:  #{$_perc + '%'};
+      }
+    }
+
+    // List items <= active index 
+    // (includes current list item)
+    > li:nth-child(-n+#{$i + 1}) {
+      @extend %step-active;
+    }
+    
+    // List items preceding active index 
+    // (excludes current list item)
+    > li:nth-child(-n+#{$i}) {
+      @extend %step-visited;
+    }
+
+    // Current list item _only_
+    > li:nth-child(#{$i + 1}) {
+      @extend %step-current;
+    }
+  }
+}
+
+// DEMO ONLY
+* {
+  box-sizing: inherit;  
+}
+
+html, body {
+  height:     100vh;
+  box-sizing: border-box;
+}
+
+body {
+  display: flex;
+}
+
+.demo {
+  flex:           1;
+  
+  display:        flex;
+  flex-direction: column;
+  
+  position:  relative;
+  height:    75%;
+  margin:    auto;
+  font-size: 12px;
+
+  @include mq {
+    height: auto;
+  }
+}
+
+.demo__blurb {
+  transform: translateX(-50%);
+  
+  position:   absolute;
+  left:       50%;
+  bottom:     100%;
+  padding:    0 0 20px;
+  text-align: center;
+  
+  @include mq {
+    padding:    0 0 30px;
+  }
+  
+  p {
+    margin: 5px;
+  }
+}

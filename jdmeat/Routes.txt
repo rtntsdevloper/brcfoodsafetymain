@@ -1,0 +1,18 @@
+
+				//product specification jd meat
+				
+				else if ($_GET['id'] == "jdps") {
+					include $_GET['id2'] . '/ps.php';
+				} else if ($_GET['id'] == "jdps1") {
+					include $_GET['id2'] . '/productsection.php';
+				} else if ($_GET['id'] == "jdpattemptaudit") {
+					include $_GET['id2'] . '/pattemptaudit.php';
+				} else if ($_GET['id'] == "jdpss") {
+					include $_GET['id2'] . '/pss.php';
+				} else if ($_GET['id'] == "jdpss1") {
+					include $_GET['id2'] . '/pss1.php';
+				} else if ($_GET['id'] == "jdpattemptauditt") {
+					include $_GET['id2'] . '/pattemptauditt.php';
+				} else if ($_GET['id'] == "jdviewspec1") {
+					include $_GET['id2'] . '/viewspec1.php';
+				} 

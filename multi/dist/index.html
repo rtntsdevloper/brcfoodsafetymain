@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>CodePen - Responsive progress reloaded</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+<link rel="stylesheet" href="./style.css">
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<div class="demo">
+  <div class="demo__blurb">
+    <p>Click any step to activate it</p>
+    <p>Shrink the viewport for RWD goodness!</p>
+  </div>
+  
+  <ol class="progress" data-progress="0">
+     <li><i>Senior management commitment</i></li>
+    <li><i>The food safety plan - HACCP</i></li>
+    <li><i>Food safety and quality management system</i></li>
+    <li><i>Site standards</i></li>
+    <li><i>Product control</i></li>
+	<li><i>Process control</i></li>
+	
+	<li><i>Personnel</i></li>
+	<li><i>Production risk zones - high risk, high care and ambient high care</i></li>
+  </ol>
+</div>
+<!-- partial -->
+  <script src='//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+  <script>
+  function onProgClick(event) {
+  const $el = $(event.currentTarget);
+  $el.parent().attr('data-progress', $el.index());
+}
+
+function initProgress() {
+  $('.progress').
+  attr('data-progress', 3).
+  on('click', 'li', onProgClick);
+}
+
+$(() => setTimeout(initProgress, 1000));
+  </script>
+
+</body>
+</html>

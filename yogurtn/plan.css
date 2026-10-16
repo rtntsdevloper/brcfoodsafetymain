@@ -1,0 +1,719 @@
+/* ================================================================
+ * BLOCK 6 ▸ CSS — DESIGN + LAYOUT
+ * ================================================================ */
+
+/* ---------- 6.1 palette & base ----------
+ * html + body LOCKED to device height, page itself never scrolls. */
+:root {
+    --g: #217346;
+    --g-dark: #164a2d;
+    --g-soft: #e8f4ec;
+    --blue: #1e88e5;
+    --amber: #f59e0b;
+    --bd: #d5ded8;
+    --bd2: #b9c8bf;
+    --txt: #22312a;
+
+    /* ★ CHANGED — frozen-pane offsets + header height now live in
+     * CSS variables. Real values are measured by JS (syncSticky)
+     * so the frozen columns stay aligned even when the table
+     * stretches on wide screens. These are only fallbacks.        */
+    --off1: 36px;
+    /* left edge of Op/Stk column  */
+    --off2: 92px;
+    /* left edge of Description    */
+    --h1h: 34px;
+    /* height of banner header row */
+}
+
+* {
+    box-sizing: border-box
+}
+
+html,
+body {
+    height: 100%;
+    /* exactly device height */
+    margin: 0;
+    overflow: hidden;
+    /* no page scrollbar */
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    /* header → toolbar → legend → table */
+    font: 12.5px "Segoe UI", Calibri, Arial, sans-serif;
+    color: var(--txt);
+    background: #eef2ee;
+}
+
+/* ---------- 6.2 top header ---------- */
+.top {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    padding: 12px 18px;
+    color: #fff;
+    background: linear-gradient(135deg, #0e4d2c 0%, #217346 55%, #2f9e67 100%);
+    box-shadow: 0 3px 14px rgba(13, 60, 35, .35);
+}
+
+.logo {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    font-size: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, .16);
+    border: 1px solid rgba(255, 255, 255, .28);
+}
+
+.top h1 {
+    margin: 0;
+    font-size: 18px;
+    letter-spacing: .3px
+}
+
+.top .sub {
+    font-size: 11.5px;
+    opacity: .85;
+    margin-top: 2px
+}
+
+.top .spacer {
+    flex: 1
+}
+
+.pill {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(255, 255, 255, .14);
+    border: 1px solid rgba(255, 255, 255, .26);
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 12.5px;
+    line-height: 1.3;
+}
+
+.pill small {
+    font-size: 9px;
+    opacity: .8;
+    text-transform: uppercase;
+    letter-spacing: .8px
+}
+
+/* ---------- 6.3 toolbar ---------- */
+.toolbar {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 8px 14px;
+    background: rgba(255, 255, 255, .92);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--bd);
+}
+
+.navbtn {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    border: 1px solid var(--bd2);
+    background: #fff;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--g-dark);
+    transition: all .15s;
+}
+
+.navbtn:hover {
+    background: var(--g-soft);
+    border-color: var(--g)
+}
+
+.dinput {
+    height: 30px;
+    border: 1px solid var(--bd2);
+    border-radius: 8px;
+    padding: 0 8px;
+    font: inherit;
+    color: var(--txt);
+    outline: 0;
+}
+
+.dinput:focus {
+    border-color: var(--g);
+    box-shadow: 0 0 0 3px rgba(33, 115, 70, .15)
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 1px solid var(--bd2);
+    background: #fff;
+    color: #254b38;
+    font: 600 12.5px "Segoe UI", Calibri, Arial;
+    transition: all .15s;
+    white-space: nowrap;
+}
+
+.btn:hover {
+    background: var(--g-soft);
+    border-color: var(--g);
+    color: var(--g-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(33, 115, 70, .18);
+}
+
+.btn:active {
+    transform: translateY(0)
+}
+
+.btn-save {
+    background: linear-gradient(135deg, #217346, #2f9e67);
+    color: #fff;
+    border-color: transparent;
+}
+
+.btn-save:hover {
+    background: linear-gradient(135deg, #1a5e39, #278b59);
+    color: #fff
+}
+
+/* live KPI stats */
+.stats {
+    display: flex;
+    gap: 8px;
+    margin-left: auto
+}
+
+.stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #f4f9f5;
+    border: 1px solid var(--bd);
+    border-radius: 10px;
+    padding: 3px 12px;
+    min-width: 74px;
+    line-height: 1.25;
+}
+
+.stat small {
+    font-size: 9px;
+    color: #6a7d71;
+    text-transform: uppercase;
+    letter-spacing: .5px
+}
+
+.stat b {
+    font-size: 13px;
+    color: var(--g-dark)
+}
+
+#st {
+    font-size: 11.5px;
+    color: #5a6b60;
+    min-width: 110px
+}
+
+#st.dirty {
+    color: #c76a00;
+    font-weight: 700;
+    animation: pulse 1s infinite
+}
+
+@keyframes pulse {
+    50% {
+        opacity: .4
+    }
+}
+
+/* ---------- 6.4 legend ---------- */
+.legend {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding: 5px 16px;
+    font-size: 11px;
+    color: #5a6b60;
+    background: #f7faf7;
+    border-bottom: 1px solid var(--bd);
+}
+
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px
+}
+
+.chip i {
+    width: 13px;
+    height: 13px;
+    border-radius: 3px;
+    border: 1px solid #b9c8bf;
+    display: inline-block;
+}
+
+.legend kbd {
+    background: #fff;
+    border: 1px solid var(--bd2);
+    border-bottom-width: 2px;
+    border-radius: 4px;
+    padding: 0 5px;
+    font: 600 10px monospace;
+    color: #33463b;
+}
+
+.legend .hint {
+    margin-left: auto
+}
+
+/* ---------- 6.5 table area — THE ONLY SCROLL CONTAINER ----------
+ * ★ CHANGED: .wrap now has LEFT/RIGHT PADDING (20px) so the card
+ *      never touches the screen edges — that's your side space.
+ * .wrap  flex:1 + min-height:0 → card shrinks, scrolls inside.
+ * .card  overflow:auto → scrolls left↔right ONLY when the table
+ *        is wider than the available space (min-width on table). */
+.wrap {
+    flex: 1 1 auto;
+    /* fill ALL remaining height */
+    min-height: 0;
+    /* CRITICAL for inner scrolling */
+    padding: 10px 20px;
+    /* ★ side space: left & right  */
+    display: flex;
+}
+
+.card {
+    flex: 1;
+    overflow: auto;
+    /* ← all scrolling happens here */
+    overscroll-behavior: contain;
+    background: #fff;
+    border: 1px solid var(--bd);
+    border-radius: 12px;
+    box-shadow: 0 2px 16px rgba(20, 50, 35, .08);
+}
+
+/* pretty scrollbars */
+.card::-webkit-scrollbar {
+    width: 10px;
+    height: 12px
+}
+
+.card::-webkit-scrollbar-thumb {
+    background: #b9cec2;
+    border-radius: 6px;
+    border: 2px solid #fff
+}
+
+.card::-webkit-scrollbar-thumb:hover {
+    background: #8fb49e
+}
+
+.card::-webkit-scrollbar-track {
+    background: #f0f4f1
+}
+
+.card::-webkit-scrollbar-corner {
+    background: #f0f4f1
+}
+
+/* ---------- 6.6 the grid ----------
+ * ★ CHANGED: width:100% — table FILLS the card on wide screens
+ *      (columns stretch a little, looks full & tidy).
+ *      min-width (inline, from PHP = sum of columns) guarantees
+ *      the table never gets crushed → when the screen is narrow,
+ *      it simply SCROLLS left↔right inside .card.               */
+table {
+    border-collapse: separate;
+    border-spacing: 0;
+    table-layout: fixed;
+    width: 100%;
+    /* ★ fill available width  */
+    /* min-width is set inline on <table> by PHP            */
+}
+
+th,
+td {
+    border-right: 1px solid var(--bd);
+    border-bottom: 1px solid var(--bd);
+    height: 26px;
+    padding: 0 4px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    font-size: 12px;
+}
+
+/* header row 1 — green banner (sticky inside .card) */
+tr.h1 th {
+    position: sticky;
+    top: 0;
+    z-index: 8;
+    background: linear-gradient(180deg, #268152, #1d6741);
+    color: #fff;
+    font-size: 12.5px;
+    letter-spacing: .4px;
+    height: var(--h1h, 34px);
+}
+
+tr.h1 th.crn {
+    left: 0;
+    z-index: 9
+}
+
+/* header row 2 — column titles (sticky, section-coloured)
+ * ★ CHANGED: top/left now read from CSS vars (JS keeps them true) */
+tr.h2 th {
+    position: sticky;
+    top: var(--h1h, 34px);
+    z-index: 6;
+    background: linear-gradient(180deg, #eaf5ee, #d9ebdf);
+    color: #1d4b30;
+    font-size: 11px;
+    font-weight: 600;
+    height: 30px;
+    border-bottom: 2px solid var(--g);
+}
+
+tr.h2 th.fz1 {
+    left: var(--off1, 36px);
+    z-index: 7
+}
+
+tr.h2 th.fz2 {
+    left: var(--off2, 92px);
+    z-index: 7
+}
+
+tr.h2 th.sec-go {
+    background: linear-gradient(180deg, #e9f2fc, #d7e7f8);
+    color: #0d47a1;
+    border-bottom-color: var(--blue);
+}
+
+tr.h2 th.sec-pk {
+    background: linear-gradient(180deg, #fef4e2, #fce8c8);
+    color: #8a5200;
+    border-bottom-color: var(--amber);
+}
+
+/* frozen body columns — ★ offsets from CSS vars (JS-synced) */
+td.rn {
+    position: sticky;
+    left: 0;
+    z-index: 4;
+    background: #eef3ef;
+    color: #9aa89f;
+    font-size: 10.5px;
+    font-weight: 600
+}
+
+td.fz1 {
+    position: sticky;
+    left: var(--off1, 36px);
+    z-index: 4;
+    background: #fff;
+    border-right: 2px solid var(--bd2)
+}
+
+td.fz2 {
+    position: sticky;
+    left: var(--off2, 92px);
+    z-index: 4;
+    border-right: 2px solid var(--bd2)
+}
+
+/* section dividers */
+.sep-go {
+    border-left: 3px solid var(--blue) !important
+}
+
+.sep-pk {
+    border-left: 3px solid var(--amber) !important
+}
+
+/* ---------- 6.7 cell colours (Excel language) ---------- */
+td.in {
+    background: #fff
+}
+
+/* type here        */
+td.semi {
+    background: #eef5ff
+}
+
+/* auto + editable  */
+td.calc {
+    background: #fffae6;
+    font-weight: 600;
+    color: #6b5200
+}
+
+/* formula          */
+td.mir {
+    background: #f6f8f7;
+    color: #8a9790;
+    font-style: italic;
+    font-size: 11px
+}
+
+td.ro {
+    background: #f2f4f3;
+    color: #55605a
+}
+
+td.desc {
+    text-align: left;
+    font-weight: 500;
+    color: #20332a;
+    background: #fbfdfc
+}
+
+.ci {
+    width: 100%;
+    height: 24px;
+    border: 0;
+    background: transparent;
+    text-align: center;
+    font: inherit;
+    color: #1b3a29;
+    outline: 0;
+}
+
+.ci:focus {
+    box-shadow: inset 0 0 0 2px var(--g);
+    background: #fff;
+    border-radius: 2px
+}
+
+tr.row-focus td {
+    background-image: linear-gradient(rgba(33, 115, 70, .06), rgba(33, 115, 70, .06));
+}
+
+tr.row-focus td.rn {
+    box-shadow: inset 3px 0 0 var(--g)
+}
+
+tbody tr:hover td {
+    background-color: #f4faf6
+}
+
+/* ---------- 6.8 negatives + totals ---------- */
+.neg {
+    color: #d32f2f !important;
+    font-weight: 800
+}
+
+.trow td {
+    background: linear-gradient(180deg, #e8f3ec, #dceee3);
+    font-weight: 700;
+    color: #14432a;
+    height: 28px;
+}
+
+.trow td.fz1,
+.trow td.fz2 {
+    background: linear-gradient(180deg, #e8f3ec, #dceee3);
+}
+
+.trow .lbl {
+    text-align: left;
+    padding-left: 10px;
+    letter-spacing: .3px
+}
+
+.trow.grand td {
+    background: linear-gradient(180deg, #d3e9da, #c2e0cc);
+    font-size: 12.5px;
+    border-top: 3px double var(--g);
+}
+
+/* ---------- 6.9 toasts ---------- */
+#toasts {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.toast {
+    padding: 10px 18px;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 12.5px;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, .28);
+    opacity: 0;
+    transform: translateY(14px);
+    transition: all .28s;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateY(0)
+}
+
+.toast.ok {
+    background: linear-gradient(135deg, #1e7e4a, #2f9e67)
+}
+
+.toast.err {
+    background: linear-gradient(135deg, #c62828, #e53935)
+}
+
+/* ---------- 6.10 responsive chrome ----------
+ * ★ side padding shrinks on small screens so the table keeps
+ *   maximum room, but never disappears completely.            */
+@media (max-height: 720px) {
+
+    /* short laptop screens */
+    .top {
+        padding: 7px 12px
+    }
+
+    .top .sub {
+        display: none
+    }
+
+    .legend .hint {
+        display: none
+    }
+
+    .wrap {
+        padding-top: 6px;
+        padding-bottom: 6px
+    }
+}
+
+@media (max-width: 1024px) {
+
+    /* tablets */
+    .stats {
+        display: none
+    }
+
+    .top .pill {
+        padding: 2px 10px;
+        font-size: 11px
+    }
+
+    .wrap {
+        padding-left: 12px;
+        padding-right: 12px
+    }
+
+    /* less side space */
+}
+
+@media (max-width: 640px) {
+
+    /* phones */
+    .top h1 {
+        font-size: 14px
+    }
+
+    .legend {
+        display: none
+    }
+
+    .btn {
+        padding: 5px 10px
+    }
+
+    .wrap {
+        padding: 6px 8px
+    }
+
+    /* minimal side space */
+}
+
+/* ---------- 6.11 print — unlock height, compact full sheet ---------- */
+@media print {
+
+    html,
+    body {
+        height: auto;
+        overflow: visible;
+        display: block
+    }
+
+    /* undo lock */
+    .top,
+    .toolbar,
+    .legend,
+    #toasts {
+        display: none !important
+    }
+
+    body {
+        background: #fff
+    }
+
+    .wrap {
+        display: block;
+        padding: 0;
+        flex: none
+    }
+
+    .card {
+        overflow: visible;
+        flex: none;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none
+    }
+
+    th,
+    td {
+        position: static !important;
+        font-size: 8.5px;
+        height: auto
+    }
+
+    td.desc {
+        min-width: 120px
+    }
+
+    /* ★ print: natural width only + slight zoom so the wide
+     *      table fits an A3 landscape page                    */
+    table {
+        width: auto !important;
+        min-width: 0 !important;
+        zoom: .62
+    }
+}
+
+@page {
+    size: A3 landscape;
+    margin: 8mm
+}
+
+/* ================================================================
+         * plan.php extras (everything above is copied from yogurt.php)
+         * ================================================================ */
+th.day a {
+    color: inherit;
+    text-decoration: none
+}
+
+th.day a:hover {
+    text-decoration: underline
+}

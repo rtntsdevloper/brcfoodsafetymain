@@ -1,0 +1,34 @@
+<input type="file" id="upload" />
+<button id="download">Download Edited CSV</button>
+
+<script>
+document.getElementById("upload").addEventListener("change", function(event) {
+  const file = event.target.files[0];
+  const reader = new FileReader();
+
+  reader.onload = function(e) {
+    let csv = e.target.result;
+
+    // Convert CSV string to array of rows
+    let rows = csv.split("\n").map(r => r.split(","));
+
+    // Example: edit first row, second column
+    rows[0][1] = "Edited Value";
+
+    // Convert back to CSV string
+    let newCsv = rows.map(r => r.join(",")).join("\n");
+
+    // Download edited CSV
+    document.getElementById("download").onclick = function() {
+      const blob = new Blob([newCsv], { type: "text/csv" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "edited.csv";
+      a.click();
+    };
+  };
+
+  reader.readAsText(file);
+});
+</script>

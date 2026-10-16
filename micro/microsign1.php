@@ -1,0 +1,29 @@
+<?php
+include '../connection.php';
+$sno = $_POST['sno'];
+$date = date("Y-m-d");
+
+//$hj=mysqli_query($con,"delete from tblfeedback1 where sno='$sno'");
+
+//print_r($_POST);
+$uniid = uniqid() . "_" . $sno;
+$folderPath = "sign/";
+
+$image_parts = explode(";base64,", $_POST['signature_image']);
+$image_type_aux = explode("image/", $image_parts[0]);
+$image_type = $image_type_aux[1];
+$image_base64 = base64_decode($image_parts[1]);
+if ($image_type == "png") {
+    $file =  $uniid . '.' . $image_type;
+
+    file_put_contents($folderPath . $file, $image_base64);
+
+    $sgh = mysqli_query($con, "UPDATE `tbl_microtrending1` SET `sign`='$file' WHERE id='$sno'");
+
+}
+echo $image_type = preg_replace('/\s+/', '', $image_type);
+
+
+?>
+
+</script>

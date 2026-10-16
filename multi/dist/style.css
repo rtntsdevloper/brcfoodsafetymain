@@ -1,0 +1,251 @@
+@charset "UTF-8";
+.progress > li {
+  transition: 0.5s color;
+  position: relative;
+  cursor: pointer;
+  background: transparent;
+}
+.progress > li:before, .progress > li:after {
+  content: "";
+  display: block;
+  width: 14px;
+  height: 14px;
+  text-align: center;
+}
+.progress > li:before {
+  transition: 0.5s background;
+  margin: -7px -7px 0;
+  border-radius: 14px;
+  box-shadow: 0 0 0 3px #ccc;
+  background: #fff;
+}
+.progress > li:after {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 14px;
+  height: 14px;
+  margin: -7px -7px;
+  line-height: 14px;
+  color: #fff;
+}
+
+.progress > li > i {
+
+  padding: 5px 10px;
+  border-radius: 5px;
+  border-top-left-radius: 0;
+  background: #eee;
+  transition: 0.5s background;
+  position: absolute;
+  width: 100px;
+  margin: -7px 0 0 20px;
+  font-style: normal;
+}
+@media only screen and (min-width: 640px) {
+  .progress > li > i {
+    border-top-left-radius: 5px;
+    text-align: center;
+  }
+}
+.progress > li > i:after {
+  transition: 0.5s border-color;
+  content: "";
+  display: block;
+  position: absolute;
+  top: 0;
+  right: 100%;
+  margin-right: -5px;
+  border: 5px solid transparent;
+  border-top-color: #eee;
+}
+@media only screen and (min-width: 640px) {
+  .progress > li > i:after {
+    top: auto;
+    left: 50%;
+    bottom: 100%;
+    right: auto;
+    margin-left: -5px;
+    margin-right: 0;
+    border-color: transparent;
+    border-bottom-color: #eee;
+  }
+}
+@media only screen and (min-width: 640px) {
+  .progress > li > i {
+    margin: 10px 0 0 -50px;
+  }
+}
+.progress > li > i:before {
+  counter-increment: point;
+  content: counter(point) ". ";
+}
+
+.progress {
+  counter-reset: point;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  flex: 1 0;
+  position: relative;
+  margin: auto;
+  padding: 0;
+  list-style: none;
+  color: #999;
+}
+@media only screen and (min-width: 640px) {
+  .progress {
+    flex-direction: row;
+    width: 80%;
+  }
+}
+.progress:before, .progress:after {
+  content: "";
+  display: block;
+  position: absolute;
+  left: -2px;
+  top: 0;
+  z-index: -1;
+}
+@media only screen and (min-width: 640px) {
+  .progress:before, .progress:after {
+    left: 0;
+    top: -2px;
+    height: 4px;
+  }
+}
+.progress:before {
+  width: 4px;
+  height: 100%;
+  background: #ccc;
+}
+@media only screen and (min-width: 640px) {
+  .progress:before {
+    width: 100%;
+    height: 4px;
+  }
+}
+.progress:after {
+  transition: 0.5s height;
+  width: 4px;
+  background: #f00;
+}
+@media only screen and (min-width: 640px) {
+  .progress:after {
+    transition-property: width;
+  }
+}
+.progress[data-progress="4"] > li:nth-child(-n+5), .progress[data-progress="3"] > li:nth-child(-n+4), .progress[data-progress="2"] > li:nth-child(-n+3), .progress[data-progress="1"] > li:nth-child(-n+2), .progress[data-progress="0"] > li:nth-child(-n+1) {
+  color: #666;
+}
+.progress[data-progress="4"] > li:nth-child(-n+5):before, .progress[data-progress="3"] > li:nth-child(-n+4):before, .progress[data-progress="2"] > li:nth-child(-n+3):before, .progress[data-progress="1"] > li:nth-child(-n+2):before, .progress[data-progress="0"] > li:nth-child(-n+1):before {
+  box-shadow: 0 0 0 3px #666, 0 0 0 5px #fff;
+}
+
+.progress[data-progress="4"] > li:nth-child(-n+4):before, .progress[data-progress="3"] > li:nth-child(-n+3):before, .progress[data-progress="2"] > li:nth-child(-n+2):before, .progress[data-progress="1"] > li:nth-child(-n+1):before, .progress[data-progress="0"] > li:nth-child(-n+0):before {
+  background: #666;
+}
+
+.progress[data-progress="4"] > li:nth-child(5) > i, .progress[data-progress="3"] > li:nth-child(4) > i, .progress[data-progress="2"] > li:nth-child(3) > i, .progress[data-progress="1"] > li:nth-child(2) > i, .progress[data-progress="0"] > li:nth-child(1) > i {
+  background: #ccc;
+}
+.progress[data-progress="4"] > li:nth-child(5) > i:after, .progress[data-progress="3"] > li:nth-child(4) > i:after, .progress[data-progress="2"] > li:nth-child(3) > i:after, .progress[data-progress="1"] > li:nth-child(2) > i:after, .progress[data-progress="0"] > li:nth-child(1) > i:after {
+  border-top-color: #ccc;
+}
+@media only screen and (min-width: 640px) {
+  .progress[data-progress="4"] > li:nth-child(5) > i:after, .progress[data-progress="3"] > li:nth-child(4) > i:after, .progress[data-progress="2"] > li:nth-child(3) > i:after, .progress[data-progress="1"] > li:nth-child(2) > i:after, .progress[data-progress="0"] > li:nth-child(1) > i:after {
+    border-color: transparent;
+    border-bottom-color: #ccc;
+  }
+}
+
+.progress[data-progress="0"]:after {
+  height: 0%;
+}
+@media only screen and (min-width: 640px) {
+  .progress[data-progress="0"]:after {
+    height: 4px;
+    width: 0%;
+  }
+}
+.progress[data-progress="1"]:after {
+  height: 25%;
+}
+@media only screen and (min-width: 640px) {
+  .progress[data-progress="1"]:after {
+    height: 4px;
+    width: 25%;
+  }
+}
+.progress[data-progress="2"]:after {
+  height: 50%;
+}
+@media only screen and (min-width: 640px) {
+  .progress[data-progress="2"]:after {
+    height: 4px;
+    width: 50%;
+  }
+}
+.progress[data-progress="3"]:after {
+  height: 75%;
+}
+@media only screen and (min-width: 640px) {
+  .progress[data-progress="3"]:after {
+    height: 4px;
+    width: 75%;
+  }
+}
+.progress[data-progress="4"]:after {
+  height: 100%;
+}
+@media only screen and (min-width: 640px) {
+  .progress[data-progress="4"]:after {
+    height: 4px;
+    width: 100%;
+  }
+}
+* {
+  box-sizing: inherit;
+}
+
+html, body {
+  height: 100vh;
+  box-sizing: border-box;
+}
+
+body {
+  display: flex;
+}
+
+.demo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  height: 75%;
+  margin: auto;
+  font-size: 12px;
+}
+@media only screen and (min-width: 640px) {
+  .demo {
+    height: auto;
+  }
+}
+
+.demo__blurb {
+  transform: translateX(-50%);
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  padding: 0 0 20px;
+  text-align: center;
+}
+@media only screen and (min-width: 640px) {
+  .demo__blurb {
+    padding: 0 0 30px;
+  }
+}
+.demo__blurb p {
+  margin: 5px;
+}
