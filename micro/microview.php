@@ -12,6 +12,7 @@
                 <div class="card-body">
 
                     <a href="admin.php?id=1"><button class="btn btn-success" style="float:right; margin-left:15px">Go Back</button></a>
+                    <a href="admin.php?id=microbact"><button class="btn btn-danger" style="float:right;margin-left:15px;">Bacteria Details</button></a>
                     <a href="admin.php?id=microadd"><button class="btn btn-danger" style="float:right">Add New</button></a>
                     <h4 class="card-title mb-3">Micro Trending</h4>
 

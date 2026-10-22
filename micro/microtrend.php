@@ -107,7 +107,25 @@ $subjectsJson = json_encode($subjects);
 
 <body>
 
+ <div class="row mb-5">
+        <div class="col-md-6">
+            <h1>Micro-Trending Results (<?php echo $cyear; ?>)</h1>
+        </div>
 
+        <script>
+            function getnewyear(year) {
+                window.location.href = "admin.php?id=microtrendsub&year=" + year;
+            }
+        </script>
+
+        <div class="col-md-6 text-right">
+            <a href="admin.php?id=microtrendsub" class="btn btn-success">Micro-Trending by Location</a>
+            <a href="admin.php?id=microtrendbact" class="btn btn-success">Micro-Trending by Bacteria</a>
+            <a href="admin.php?id=microtrending" class="btn btn-primary">Go Back</a>
+
+
+        </div>
+    </div>
     <div class="chart-container">
         <div class="row">
             <div class="col-md-6">

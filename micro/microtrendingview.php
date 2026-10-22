@@ -1,18 +1,14 @@
 <?php
+
 $mid = $_GET['mid'];
-
-
-
 
 $tcheck = mysqli_query($con, "SELECT * FROM `tbl_microtrending` WHERE id='$mid'");
 $tcheckq = mysqli_fetch_array($tcheck);
-$jid = $tcheckq['id'];
 
+$jid = $tcheckq['id'];
 $jmid = $tcheckq['mid'];
 $month = $tcheckq['admonth'];
-
 $year = date("Y", strtotime($month));
-
 
 $mname = mysqli_query($con, "SELECT * FROM `tbl_micortrend` WHERE id='$jmid'");
 $mname1 = mysqli_fetch_array($mname);
@@ -24,9 +20,47 @@ $sname = mysqli_query($con, "SELECT * FROM `tbl_micortrend1` WHERE id='$sid'");
 $sname1 = mysqli_fetch_array($sname);
 $sname2 = $sname1['name'];
 
+// ===== Fetch ALL events (justifications + attempts) in chronological order =====
+$allQ = mysqli_query($con,
+    "SELECT * FROM `tbl_microtrending1`
+     WHERE eid='$jid'
+       AND (
+            (category IS NOT NULL AND category <> '')
+            OR (reason   IS NOT NULL AND reason   <> '')
+            OR (caction  IS NOT NULL AND caction  <> '')
+            OR (rca      IS NOT NULL AND rca      <> '')
+            OR (paction  IS NOT NULL AND paction  <> '')
+            OR (status = 'Pass')
+            OR (status = 'Fail')
+       )
+     ORDER BY id ASC");
 
+$timelineRows = [];
+while ($r = mysqli_fetch_array($allQ)) {
+    $timelineRows[] = $r;
+}
+
+$masterStatus  = $tcheckq['status'];
+$masterFstatus = $tcheckq['fstatus'];
+
+// Determine what the last event was (for the bottom button)
+$lastEventType = null;
+$lastStatus    = null;
+foreach ($timelineRows as $tr) {
+    $isJ = (!empty($tr['category']) || !empty($tr['reason']) || !empty($tr['caction']) || !empty($tr['rca']) || !empty($tr['paction']));
+    $isA = ($tr['status'] == 'Pass' || $tr['status'] == 'Fail');
+    if ($isJ) {
+        $lastEventType = 'justification';
+        $lastStatus    = null;
+    } elseif ($isA) {
+        $lastEventType = 'attempt';
+        $lastStatus    = $tr['status'];
+    }
+}
 ?>
+
 <style>
+    /* ===== PAGE HEADER ===== */
     .page-header {
         text-align: center;
         margin-bottom: 3rem;
@@ -51,27 +85,44 @@ $sname2 = $sname1['name'];
         color: #6a11cb;
     }
 
+    /* ===== TIMELINE ===== */
     .timeline {
         position: relative;
         max-width: 1200px;
         margin: 0 auto;
     }
 
-    /* Vertical line */
     .timeline::before {
         content: '';
         position: absolute;
         width: 6px;
-        background: linear-gradient(to bottom, #6a11cb, #2575fc);
+        background: #e6e6e6;
         top: 0;
         bottom: 0;
         left: 30px;
         border-radius: 10px;
+        z-index: 0;
     }
 
-    /* Timeline end marker */
     .timeline::after {
         content: '';
+        position: absolute;
+        width: 6px;
+        background: linear-gradient(to bottom, #6a11cb, #2575fc, #6a11cb);
+        top: 0;
+        left: 30px;
+        border-radius: 10px;
+        z-index: 1;
+        height: 0;
+        animation: timelineFlow 2.5s ease-out forwards;
+    }
+
+    @keyframes timelineFlow {
+        0%   { height: 0%;   opacity: 0.9; }
+        100% { height: 100%; opacity: 0.9; }
+    }
+
+    .timeline-end-dot {
         position: absolute;
         width: 20px;
         height: 20px;
@@ -80,20 +131,20 @@ $sname2 = $sname1['name'];
         bottom: 0;
         left: 23px;
         border-radius: 50%;
-        z-index: 2;
+        z-index: 3;
         box-shadow: 0 0 0 3px #28a745;
     }
 
-    /* Timeline container */
+    /* ===== TIMELINE ITEMS ===== */
     .timeline-container {
         padding: 10px 40px;
         position: relative;
         width: 100%;
         padding-left: 70px;
         margin-bottom: 30px;
+        z-index: 2;
     }
 
-    /* Circle markers */
     .timeline-container::after {
         content: '';
         position: absolute;
@@ -104,10 +155,12 @@ $sname2 = $sname1['name'];
         top: 15px;
         left: 21px;
         border-radius: 50%;
-        z-index: 1;
+        z-index: 3;
     }
 
-    /* Content styling */
+    .timeline-container.is-justification::after { border-color: #6a11cb; }
+    .timeline-container.is-pass::after          { border-color: #28a745; }
+
     .timeline-content {
         padding: 25px;
         background-color: white;
@@ -118,12 +171,23 @@ $sname2 = $sname1['name'];
         border-left: 4px solid #2575fc;
     }
 
+    .timeline-content.jc   { border-left: 4px solid #6a11cb; }
+    .timeline-content.pass { border-left: 4px solid #28a745; }
+
     .timeline-content:hover {
         transform: translateY(-5px);
         box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
     }
 
-    /* Date styling */
+    .card-title-inline {
+        color: #2c3e50;
+        margin-bottom: 15px;
+        font-weight: 600;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eef2f6;
+        font-size: 1.15rem;
+    }
+
     .timeline-date {
         font-weight: bold;
         color: #2575fc;
@@ -134,8 +198,18 @@ $sname2 = $sname1['name'];
         font-size: 1.1rem
     }
 
+    .timeline-bact {
+        font-weight: bold;
+        width: 100%;
+        text-align: left;
+        color: #2575fc;
+        margin-bottom: 8px;
+        gap: 8px;
+        font-size: 1.2rem
+    }
+
     .timeline-date i {
-        font-size: 1.1rem;
+        font-size: 1.2rem;
     }
 
     .timeline-content h4 {
@@ -150,13 +224,55 @@ $sname2 = $sname1['name'];
         margin-bottom: 15px;
     }
 
-    /* Status badges */
+    /* Justification key/value grid */
+    .jc-row {
+        display: flex;
+        flex-wrap: wrap;
+        margin-left: -10px;
+        margin-right: -10px;
+    }
+
+    .jc-col {
+        padding-left: 10px;
+        padding-right: 10px;
+        margin-bottom: 14px;
+        box-sizing: border-box;
+    }
+
+    .jc-6 { flex: 0 0 50%; max-width: 50%; }
+    .jc-12 { flex: 0 0 100%; max-width: 100%; }
+
+    @media (max-width: 768px) {
+        .jc-6 { flex: 0 0 100%; max-width: 100%; }
+    }
+
+    .jc-label {
+        display: block;
+        font-weight: bold;
+        color: #6a11cb;
+        margin-bottom: 6px;
+        font-size: 1rem;
+    }
+
+    .jc-value {
+        color: #555;
+        font-size: 1rem;
+        line-height: 1.6;
+        font-weight: 500;
+        word-wrap: break-word;
+    }
+
+    .jc-value.empty {
+        color: #a0aec0;
+        font-style: italic;
+        font-weight: 400;
+    }
+
     .badge {
         font-size: 0.75rem;
         padding: 6px 12px;
     }
 
-    /* End message styling */
     .timeline-end {
         padding: 10px 40px;
         position: relative;
@@ -164,54 +280,17 @@ $sname2 = $sname1['name'];
         padding-left: 70px;
         margin-top: 20px;
         text-align: center;
+        z-index: 2;
     }
 
-    .end-message {
-        background: linear-gradient(135deg, #28a745, #20c997);
-        color: white;
-        padding: 25px;
-        border-radius: 10px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        position: relative;
-    }
-
-    .end-message h3 {
-        margin-bottom: 10px;
-        font-weight: 600;
-    }
-
-    .end-message p {
-        margin-bottom: 0;
-        opacity: 0.9;
-    }
-
-    /* Mobile responsiveness */
     @media screen and (max-width: 768px) {
-        .timeline::before {
-            left: 20px;
-        }
-
-        .timeline::after {
-            left: 13px;
-        }
-
-        .timeline-container {
-            padding-left: 50px;
-            padding-right: 15px;
-        }
-
-        .timeline-container::after {
-            left: 11px;
-        }
-
-        .timeline-content {
-            padding: 20px;
-        }
-
-        .timeline-end {
-            padding-left: 50px;
-            padding-right: 15px;
-        }
+        .timeline::before,
+        .timeline::after { left: 20px; }
+        .timeline-end-dot { left: 13px; }
+        .timeline-container { padding-left: 50px; padding-right: 15px; }
+        .timeline-container::after { left: 11px; }
+        .timeline-content { padding: 20px; }
+        .timeline-end { padding-left: 50px; padding-right: 15px; }
     }
 
     .footer {
@@ -222,217 +301,216 @@ $sname2 = $sname1['name'];
         font-size: 0.9rem;
     }
 </style>
-</head>
 
-<body>
-    <div class="container">
-        <div class="page-header">
-            <h1 class="text-light"><?php echo $mname2; ?> (<?php echo $year; ?>)</h1>
-            <p><?php echo $sname2; ?> (<?php echo date("M Y", strtotime($month)); ?>)</p>
-        </div>
+<div class="container">
 
-        <div class="timeline">
-            <?php
+    <!-- ===== PAGE HEADER ===== -->
+    <div class="page-header">
+        <h1 class="text-light"><?php echo $mname2; ?> (<?php echo $year; ?>)</h1>
+        <p><?php echo $sname2; ?> (<?php echo date("M Y", strtotime($month)); ?>)</p>
+    </div>
 
-            $tcheck = mysqli_query($con, "SELECT * FROM `tbl_microtrending1` WHERE eid='$jid'and status !='Pass'");
-            foreach ($tcheck as $tcheckv) {
+    <!-- ===== TIMELINE ===== -->
+    <div class="timeline">
 
-                if ($tcheckv['status'] == 'Fail') {
-            ?>
+        <?php foreach ($timelineRows as $rowItem):
 
+            $isJustification = (
+                (!empty($rowItem['category'])) ||
+                (!empty($rowItem['reason'])) ||
+                (!empty($rowItem['caction'])) ||
+                (!empty($rowItem['rca'])) ||
+                (!empty($rowItem['paction']))
+            );
 
-                    <!-- Timeline Item 1 -->
-                    <div class="timeline-container">
-                        <div class="timeline-content">
-                            <div class="timeline-date">
-                                <b style="color:#6a11cb;">Sample date : </b>
-                                <i class="fa fa-calendar"></i> <?php echo date("M d, Y", strtotime($tcheckv['sample']));  ?>
-                            </div>
-                            <div class="timeline-date">
-                                <b style="color:#6a11cb;">Sample testing date :</b>
-                                <i class="fa fa-calendar"></i> <?php echo date("M d, Y", strtotime($tcheckv['testing']));  ?>
-                            </div>
-                            <div class="timeline-date">
-                                <b style="color:#6a11cb;">Issue date :</b>
-                                <i class="fa fa-calendar"></i> <?php echo date("M d, Y", strtotime($tcheckv['issue']));  ?>
-                            </div>
+            $isAttempt = ($rowItem['status'] == 'Pass' || $rowItem['status'] == 'Fail');
 
-                            <div class="timeline-date">
-                                <b style="color:#6a11cb;">Report no :</b>
-                                <i class="fa fa fa-server"></i> <?php echo $tcheckv['reportno'];  ?>
-                            </div>
-                            <div class="timeline-date">
-                                <b style="color:#6a11cb;">Report :</b>
-                                <a href="micro/upload/<?php echo $tcheckv['report']; ?>" target="_blank" rel="noopener noreferrer"><i class="fa fa fa-file-pdf-o"></i>Uploaded Document</a>
-                            </div>
-                            <div class="timeline-date">
-                                <b style="color:#6a11cb;">Status :</b>
-                                <i class="fa fa-file-text-o text-danger"> Fail</i>
-                            </div>
-                        </div>
-                    </div>
-                <?php
-                } elseif ($tcheckv['status'] == 'Justified') {
-                ?>
+            if (!$isJustification && !$isAttempt) continue;
 
-                    <div class="timeline-container">
-                        <div class="timeline-content">
-                            <div class="timeline-date text-center text-info">
-                                <b style="color:#6a11cb;">Microtesting Justification</b>
-                               
-                            </div>
-                            <div class="timeline-date">
-                                <b style="color:#6a11cb;">Date : </b>
-                                <i class="fa fa-calendar"></i> <?php echo date("M d, Y h:i A", strtotime($tcheckv['attempt_on']));  ?>
-                            </div>
-                            <div class="timeline-date">
-                                <b style="color:#6a11cb;">Reason Category :</b>
-                                <?php echo $tcheckv['category']; ?>
-                            </div>
-                            <div class="timeline-date">
-                                <b style="color:#6a11cb;">Any other reason :</b>
-                                <?php echo $tcheckv['reason']; ?>
-                            </div>
-                            <?php if ($tcheckv['category'] == 'missed testing' || $tcheckv['category'] == 'others') {
-                            ?>
-                                <div class="timeline-date">
-                                    <b style="color:#6a11cb;">Corrective Action</b>
-                                    <i class="fa fa fa-server"></i> <?php echo $tcheckv['caction'];  ?>
-                                </div>
-                                <div class="timeline-date">
-                                    <b style="color:#6a11cb;">RCA:</b>
-                                    <a href="micro/upload/<?php echo $tcheckv['rca']; ?>" target="_blank" rel="noopener noreferrer"><i class="fa fa fa-file-pdf-o"></i>Uploaded Document</a>
-                                </div>
-                                <div class="timeline-date">
-                                    <b style="color:#6a11cb;">Preventive Action :</b>
-                                    <i class="fa fa-file-text-o text-danger"> <?php echo $tcheckv['paction']; ?></i>
-                                </div>
-                            <?php
-                            }
-                            ?>
+            if ($isJustification):
+        ?>
 
-
-                        </div>
+            <!-- ===== JUSTIFICATION EVENT ===== -->
+            <div class="timeline-container is-justification">
+                <div class="timeline-content jc">
+                    <div class="card-title-inline">
+                        <i class="fa fa-clipboard"></i> Justification Details
                     </div>
 
-
-
-                <?php
-
-                }
-            }
-
-            if ($tcheckq['status'] == 'Pass') {
-                $tcheckp = mysqli_query($con, "SELECT * FROM `tbl_microtrending1` WHERE eid='$jid'and status='Pass'");
-                $tcheckp1 = mysqli_fetch_array($tcheckp);
-                ?>
-
-
-                <!-- Timeline End Marker -->
-                <div class="timeline-end mt-5">
-
-                    <div class="timeline-content" style=" border-left: 4px solid #28a745;">
-                        <div class="timeline-date">
-                            <b style="color:#6a11cb;">Sample date : </b>
-                            <i class="fa fa-calendar"></i> <?php echo date("M d, Y", strtotime($tcheckp1['sample']));  ?>
-                        </div>
-                        <div class="timeline-date">
-                            <b style="color:#6a11cb;">Sample testing date :</b>
-                            <i class="fa fa-calendar"></i> <?php echo date("M d, Y", strtotime($tcheckp1['testing']));  ?>
-                        </div>
-                        <div class="timeline-date">
-                            <b style="color:#6a11cb;">Issue date :</b>
-                            <i class="fa fa-calendar"></i> <?php echo date("M d, Y", strtotime($tcheckp1['issue']));  ?>
+                    <div class="jc-row">
+                        <div class="jc-col jc-6">
+                            <span class="jc-label">Attempt On :</span>
+                            <div class="jc-value">
+                                <?php echo !empty($rowItem['attempt_on']) ? date("M d, Y H:i", strtotime($rowItem['attempt_on'])) : '—'; ?>
+                            </div>
                         </div>
 
-                        <div class="timeline-date">
-                            <b style="color:#6a11cb;">Report no :</b>
-                            <i class="fa fa fa-server"></i> <?php echo $tcheckp1['reportno'];  ?>
+                        <div class="jc-col jc-6">
+                            <span class="jc-label">Reason Category :</span>
+                            <div class="jc-value">
+                                <?php echo !empty($rowItem['category']) ? htmlspecialchars(ucfirst($rowItem['category'])) : '—'; ?>
+                            </div>
                         </div>
-                        <div class="timeline-date">
-                            <b style="color:#6a11cb;">Report :</b>
-                            <a href="micro/upload/<?php echo $tcheckp1['report']; ?>" target="_blank" rel="noopener noreferrer"><i class="fa fa fa-file-pdf-o"></i>Uploaded Document</a>
+
+                        <div class="jc-col jc-12">
+                            <span class="jc-label">Reason / Details :</span>
+                            <div class="jc-value <?php echo empty($rowItem['reason']) ? 'empty' : ''; ?>">
+                                <?php echo !empty($rowItem['reason']) ? nl2br(htmlspecialchars($rowItem['reason'])) : 'No reason provided'; ?>
+                            </div>
                         </div>
-                        <div class="timeline-date">
-                            <b style="color:#6a11cb;">Status :</b>
-                            <i class="fa fa-file-text-o text-success"> Pass</i>
+
+                        <div class="jc-col jc-6">
+                            <span class="jc-label">Corrective Action :</span>
+                            <div class="jc-value <?php echo empty($rowItem['caction']) ? 'empty' : ''; ?>">
+                                <?php echo !empty($rowItem['caction']) ? nl2br(htmlspecialchars($rowItem['caction'])) : 'Not specified'; ?>
+                            </div>
+                        </div>
+
+                        <div class="jc-col jc-6">
+                            <span class="jc-label">RCA (Root Cause Analysis) :</span>
+                            <div class="jc-value <?php echo empty($rowItem['rca']) ? 'empty' : ''; ?>">
+                                <?php echo !empty($rowItem['rca']) ? nl2br(htmlspecialchars($rowItem['rca'])) : 'Not specified'; ?>
+                            </div>
+                        </div>
+
+                        <div class="jc-col jc-12">
+                            <span class="jc-label">Preventive Action :</span>
+                            <div class="jc-value <?php echo empty($rowItem['paction']) ? 'empty' : ''; ?>">
+                                <?php echo !empty($rowItem['paction']) ? nl2br(htmlspecialchars($rowItem['paction'])) : 'Not specified'; ?>
+                            </div>
                         </div>
                     </div>
                 </div>
-            <?php
-            } elseif ($tcheckq['status'] == 'Fail' && $tcheckq['fstatus'] == 'Yes') {
-            ?>
+            </div>
 
+        <?php
+            elseif ($isAttempt):
+                $isPass = ($rowItem['status'] == 'Pass');
+                $cardClass = $isPass ? 'pass' : '';
+                $containerClass = $isPass ? 'is-pass' : '';
+        ?>
 
-                <?php
+            <!-- ===== ATTEMPT EVENT ===== -->
+            <div class="timeline-container <?php echo $containerClass; ?>">
+                <div class="timeline-content <?php echo $cardClass; ?>">
 
-            } elseif ($tcheckq['status'] == 'Justified') {
-
-
-
-                $subsq = mysqli_query($con, "SELECT * FROM `tbl_microtrending1` WHERE eid='$jid' and status='Fail'");
-                $sub = mysqli_num_rows($subsq);
-
-
-
-
-                if ($sub > 0) {
-                ?>
-                    <div class="timeline-end mt-5">
-
-                        <div class="timeline-content" style=" border-left: 4px solid #b7110eff;">
-                            <a href="admin.php?id=microtattempt&mid=<?php echo $mid; ?>&month=<?php echo $month; ?>&sid=<?php echo $sid; ?>" class="btn btn-danger">Re-Attempt</a>
-                        </div>
+                    <div class="timeline-date">
+                        <b style="color:#6a11cb;">Sample date : </b>
+                        <i class="fa fa-calendar"></i> <?php echo date("M d, Y", strtotime($rowItem['sample'])); ?>
                     </div>
-                <?php
-                } else {
-                ?>
-                    <div class="timeline-end mt-5">
-
-                        <div class="timeline-content" style=" border-left: 4px solid #b7110eff;">
-                            <a href="admin.php?id=microtattempt&mid=<?php echo $mid; ?>&month=<?php echo $month; ?>&sid=<?php echo $sid; ?>" class="btn btn-danger">Attempt Micro</a>
-                        </div>
+                    <div class="timeline-date">
+                        <b style="color:#6a11cb;">Sample testing date :</b>
+                        <i class="fa fa-calendar"></i> <?php echo date("M d, Y", strtotime($rowItem['testing'])); ?>
                     </div>
-                <?php
-                }
+                    <div class="timeline-date">
+                        <b style="color:#6a11cb;">Issue date :</b>
+                        <i class="fa fa-calendar"></i> <?php echo date("M d, Y", strtotime($rowItem['issue'])); ?>
+                    </div>
 
-                ?>
-                <div class="timeline-end mt-5">
+                    <div class="timeline-date">
+                        <b style="color:#6a11cb;">Report no :</b>
+                        <i class="fa fa fa-server"></i> <?php echo $rowItem['reportno']; ?>
+                    </div>
 
-                    <div class="timeline-content" style=" border-left: 4px solid #28a745;">
-                        <div class="timeline-date">
-                            <b style="color:#6a11cb;">Sample date : </b>
-                            <i class="fa fa-calendar"></i> <?php echo date("M d, Y", strtotime($tcheckp1['sample']));  ?>
-                        </div>
-                        <div class="timeline-date">
-                            <b style="color:#6a11cb;">Sample testing date :</b>
-                            <i class="fa fa-calendar"></i> <?php echo date("M d, Y", strtotime($tcheckp1['testing']));  ?>
-                        </div>
-                        <div class="timeline-date">
-                            <b style="color:#6a11cb;">Issue date :</b>
-                            <i class="fa fa-calendar"></i> <?php echo date("M d, Y", strtotime($tcheckp1['issue']));  ?>
-                        </div>
+                    <div class="timeline-date mb-3">
+                        <b style="color:#6a11cb;">Report :</b>
+                        <a href="micro/upload/<?php echo $rowItem['report']; ?>" target="_blank" rel="noopener noreferrer">
+                            <i class="fa fa fa-file-pdf-o"></i> Uploaded Document
+                        </a>
+                    </div>
 
-                        <div class="timeline-date">
-                            <b style="color:#6a11cb;">Report no :</b>
-                            <i class="fa fa fa-server"></i> <?php echo $tcheckp1['reportno'];  ?>
+                    <!-- ===== BACTERIA TABLE ===== -->
+                    <?php
+                    $tcheckid = $rowItem['id'];
+
+                    $bactname = mysqli_query($con, "SELECT * FROM `microtrendb` WHERE mmid='$tcheckid' AND mid='$jid'");
+                    $bactnamex = mysqli_num_rows($bactname);
+                    if ($bactnamex > 0) {
+                    ?>
+                        <div class="timeline-bact">
+                            <div class="container-fluid">
+                                <div class="row">
+                                    <div class="col-md-2 m-0 p-0">
+                                        <b style="color:#6a11cb;text-align:left;">Bacterias :</b>
+                                    </div>
+                                    <div class="col-md-10">
+                                        <table class="table text-center" style="font-size: 0.8 rem;">
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Acceptable Limit</th>
+                                                <th>Rejectable Limit</th>
+                                                <th>Actual Value</th>
+                                                <th>Status</th>
+                                            </tr>
+
+                                            <?php
+                                            $bactname = mysqli_query($con, "SELECT * FROM `microtrendb` WHERE mmid='$tcheckid' AND mid='$jid'");
+                                            foreach ($bactname as $bactvalue) {
+                                            ?>
+                                                <tr>
+                                                    <td><?php echo $bactvalue['name']; ?></td>
+                                                    <td><?php echo $bactvalue['accept']; ?></td>
+                                                    <td><?php echo $bactvalue['reject']; ?></td>
+                                                    <td><?php echo $bactvalue['actual']; ?></td>
+                                                    <td><?php echo $bactvalue['status']; ?></td>
+                                                </tr>
+                                            <?php } ?>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="timeline-date">
-                            <b style="color:#6a11cb;">Report :</b>
-                            <a href="micro/upload/<?php echo $tcheckp1['report']; ?>" target="_blank" rel="noopener noreferrer"><i class="fa fa fa-file-pdf-o"></i>Uploaded Document</a>
-                        </div>
-                        <div class="timeline-date">
-                            <b style="color:#6a11cb;">Status :</b>
+                    <?php } ?>
+
+                    <div class="timeline-date">
+                        <b style="color:#6a11cb;">Status :</b>
+                        <?php if ($isPass): ?>
                             <i class="fa fa-file-text-o text-success"> Pass</i>
-                        </div>
+                        <?php else: ?>
+                            <i class="fa fa-file-text-o text-danger"> Fail</i>
+                        <?php endif; ?>
                     </div>
+
                 </div>
-            <?php
+            </div>
+
+        <?php
+            endif;
+        endforeach;
+        ?>
+
+        <!-- ===== BOTTOM ACTION BUTTON ===== -->
+        <?php
+        $showAddTest   = false;
+        $showReAttempt = false;
+
+        if ($masterStatus != 'Pass') {
+            if ($lastEventType === 'justification') {
+                $showAddTest = true;
+            } elseif ($lastEventType === 'attempt' && $lastStatus == 'Fail' && $masterFstatus == 'Yes') {
+                $showReAttempt = true;
             }
+        }
+        ?>
 
-            ?>
-        </div>
+        <?php if ($showAddTest): ?>
+            <div class="timeline-end mt-5">
+                <div class="timeline-content" style=" border-left: 4px solid #2575fc;">
+                    <a href="admin.php?id=microtattempt&mid=<?php echo $mid; ?>&month=<?php echo $month; ?>&sid=<?php echo $sid; ?>" class="btn btn-primary">Add Test</a>
+                </div>
+            </div>
+        <?php endif; ?>
+
+        <?php if ($showReAttempt): ?>
+            <div class="timeline-end mt-5">
+                <div class="timeline-content" style=" border-left: 4px solid #b7110eff;">
+                    <a href="admin.php?id=microtattempt&mid=<?php echo $mid; ?>&month=<?php echo $month; ?>&sid=<?php echo $sid; ?>" class="btn btn-danger">Re-Attempt</a>
+                </div>
+            </div>
+        <?php endif; ?>
+
+        <!-- Green end dot -->
+        <div class="timeline-end-dot"></div>
+
     </div>
-
-
-    </div>
+</div>

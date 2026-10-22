@@ -1,275 +1,224 @@
 <?php
 $mid = $_GET['mid'];
 
+// Fetch current record so we can copy its columns into the new month row
+$currentQ = mysqli_query($con, "SELECT * FROM `tbl_microtrending` WHERE id='$mid'");
+$currentRow = mysqli_fetch_assoc($currentQ);
 ?>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-<style>
-    body {
-        background: linear-gradient(135deg, #eef2f7 0%, #dfe7f1 100%);
-        min-height: 100vh;
-    }
 
-    .form-card {
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-        border: none;
-        border-radius: 14px;
-        overflow: hidden;
-    }
+<div class="container-fluid">
 
-    .card-header {
-        background: linear-gradient(135deg, #ffffff 0%, #f8f9fc 100%);
-        border-bottom: 1px solid #eaecef !important;
-    }
+  <div class="main-content">
+    <div class="breadcrumb">
+      <h1 class="mr-2"><?php echo $headingname; ?></h1>
+      <ul>
+        <li><a href="">Micro Trending</a></li>
+        <li>Justification</li>
+      </ul>
+    </div>
 
-    .conditional-section {
-        transition: all 0.25s ease;
-    }
+    <div class="container-fluid">
 
-    textarea {
-        resize: vertical;
-    }
-
-    .bi {
-        vertical-align: -0.125em;
-    }
-
-    /* ===== Attractive Go Back Button (header pill) ===== */
-    .btn-go-back {
-        background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-        color: #fff;
-        border: none;
-        border-radius: 50px;
-        padding: 0.4rem 1.1rem;
-        font-weight: 600;
-        font-size: 0.9rem;
-        letter-spacing: 0.3px;
-        box-shadow: 0 4px 12px rgba(37, 117, 252, 0.35);
-        transition: all 0.3s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.4rem;
-    }
-
-    .btn-go-back:hover,
-    .btn-go-back:focus {
-        background: linear-gradient(135deg, #2575fc 0%, #6a11cb 100%);
-        color: #fff;
-        transform: translateY(-2px);
-        box-shadow: 0 8px 18px rgba(106, 17, 203, 0.45);
-        text-decoration: none;
-    }
-
-    .btn-go-back:active {
-        transform: translateY(0);
-        box-shadow: 0 4px 10px rgba(37, 117, 252, 0.35);
-    }
-
-    .btn-go-back i {
-        font-size: 1rem;
-        transition: transform 0.3s ease;
-    }
-
-    .btn-go-back:hover i {
-        transform: translateX(-4px);
-    }
-
-    /* ===== Attractive Submit Button ===== */
-    .btn-submit {
-        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-        color: #fff;
-        border: none;
-        border-radius: 50px;
-        padding: 0.6rem 1.8rem;
-        font-weight: 600;
-        letter-spacing: 0.4px;
-        box-shadow: 0 4px 14px rgba(17, 153, 142, 0.4);
-        transition: all 0.3s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .btn-submit:hover,
-    .btn-submit:focus {
-        background: linear-gradient(135deg, #38ef7d 0%, #11998e 100%);
-        color: #fff;
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(17, 153, 142, 0.55);
-        text-decoration: none;
-    }
-
-    .btn-submit:active {
-        transform: translateY(0);
-        box-shadow: 0 4px 10px rgba(17, 153, 142, 0.4);
-    }
-
-    .btn-submit i {
-        font-size: 1.15rem;
-        transition: transform 0.3s ease;
-    }
-
-    .btn-submit:hover i {
-        transform: scale(1.15) rotate(-8deg);
-    }
-</style>
-
-
-<div class="container-fluid py-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-8 col-md-10">
-
-            <div class="card form-card">
-
-                <!-- ===== CARD HEADER WITH GO BACK BUTTON ===== -->
-                <div class="card-header pt-4 pb-3">
-                    <div class="d-flex justify-content-between align-items-start flex-wrap">
-                        <div>
-                            <h3 class="mb-0 text-primary">
-                                <i class="bi bi-clipboard-check mr-2"></i>Downtime / Issue Report
-                            </h3>
-                            <p class="text-muted mt-2 mb-0">Fill in the details below. This is a static form — no data is submitted.</p>
-                        </div>
-                        <a href="admin.php?id=microtattempt&mid=<?php echo $mid; ?>" class="btn btn-go-back mt-2 mt-sm-0">
-                            <i class="bi bi-arrow-left-circle-fill"></i> Go Back
-                        </a>
-                    </div>
-                </div>
-
-                <div class="card-body">
-                    <!-- STATIC FORM – no action attribute -->
-                    <form id="downtimeForm" method="post">
-
-                        <!-- DATETIME INPUT -->
-                        <div class="form-group">
-                            <label for="datetimeInput" class="font-weight-bold">
-                                <i class="bi bi-calendar-event mr-1"></i>Date & Time <span class="text-danger">*</span>
-                            </label>
-                            <input type="datetime-local" class="form-control" name="dtime" id="datetimeInput" required>
-                            <small class="form-text text-muted">Select the date and time of the issue.</small>
-                        </div>
-
-                        <!-- SELECT OPTION -->
-                        <div class="form-group">
-                            <label for="reasonSelect" class="font-weight-bold">
-                                <i class="bi bi-list-ul mr-1"></i>Reason Category <span class="text-danger">*</span>
-                            </label>
-                            <select class="form-control" id="reasonSelect" name="category" required>
-                                <option value="" disabled selected>-- Select a reason --</option>
-                                <option value="equipment not in use">Equipment/Machine Not In Use</option>
-                                <option value="no production">No Production</option>
-                                <option value="missed testing">Missed Testing</option>
-                                <option value="others">Others</option>
-                            </select>
-                            <small class="form-text text-muted">Choose the category that best describes the situation.</small>
-                        </div>
-
-                        <!-- TEXTAREA: ANY OTHER REASON -->
-                        <div class="form-group">
-                            <label for="otherReasonTextarea" class="font-weight-bold">
-                                <i class="bi bi-pencil-square mr-1"></i>Any Other Reason / Details
-                            </label>
-                            <textarea class="form-control" id="otherReasonTextarea" rows="3" name="reason" placeholder="Describe any additional context or reason..."></textarea>
-                        </div>
-
-                        <!-- CONDITIONAL SECTION -->
-                        <div id="conditionalSection" class="conditional-section" style="display: none;">
-                            <hr class="my-4">
-                            <h5 class="text-secondary mb-3">
-                                <i class="bi bi-tools mr-2"></i>Additional Actions Required
-                            </h5>
-
-                            <!-- CORRECTIVE ACTION -->
-                            <div class="form-group">
-                                <label for="correctiveAction" class="font-weight-bold">
-                                    <i class="bi bi-wrench-adjustable mr-1"></i>Corrective Action
-                                </label>
-                                <textarea class="form-control" id="correctiveAction" rows="2" name="caction" placeholder="Describe the corrective action taken or planned..."></textarea>
-                            </div>
-
-                            <!-- RCA -->
-                            <div class="form-group">
-                                <label for="rcaInput" class="font-weight-bold">
-                                    <i class="bi bi-search mr-1"></i>RCA (Root Cause Analysis)
-                                </label>
-                                <textarea class="form-control" id="rcaInput" rows="2" name="rca" placeholder="Enter root cause analysis findings..."></textarea>
-                            </div>
-
-                            <!-- PREVENTIVE ACTION -->
-                            <div class="form-group">
-                                <label for="preventiveAction" class="font-weight-bold">
-                                    <i class="bi bi-shield-check mr-1"></i>Preventive Action
-                                </label>
-                                <textarea class="form-control" id="preventiveAction" rows="2" name="paction" placeholder="Describe preventive measures to avoid recurrence..."></textarea>
-                            </div>
-                        </div>
-
-                        <!-- ===== SUBMIT BUTTON ===== -->
-                        <div class="text-center mt-4">
-                            <button type="submit" class="btn btn-submit" name="submit">
-                                <i class="bi bi-send-check-fill"></i> Submit Report
-                            </button>
-                        </div>
-
-                    </form>
-                </div>
+      <div class="col-md-12 mt-5 mb-5">
+        <div class="card">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="card-title">Add Justification</div>
+              </div>
+              <div class="col-md-6">
+                <a href="admin.php?id=microtrending" class="btn btn-success" style="float: right;">Go Back</a>
+              </div>
             </div>
 
+            <form id="justificationForm" method="post">
+
+              <!-- Row 1: Date & Time + Reason Category -->
+              <div class="form-row">
+                <div class="form-col col-md-6">
+                  <label class="form-label">Date &amp; Time <span class="required">*</span></label>
+                  <input type="datetime-local" class="form-control" name="dtime" required>
+                </div>
+
+                <div class="form-col col-md-6">
+                  <label class="form-label">Reason Category <span class="required">*</span></label>
+                  <select class="form-control" id="reasonSelect" name="category" required>
+                    <option value="" disabled selected>Select Reason</option>
+                    <option value="equipment not in use">Equipment/Machine Not In Use</option>
+                    <option value="no production">No Production</option>
+                    <option value="missed testing">Missed Testing</option>
+                    <option value="others">Others</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Row 2: Any other reason -->
+              <div class="form-row">
+                <div class="form-col col-md-12">
+                  <label class="form-label">Any Other Reason / Details</label>
+                  <textarea class="form-control" rows="3" name="reason"
+                    placeholder="Describe any additional context or reason..."></textarea>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="col-md-6">
+                  <div class="form-row">
+                    <div class="form-col col-md-12">
+                      <label class="form-label">Frequency</label>
+                      <input class="form-control" name="freq" placeholder="Type Frequency">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="form-row">
+                    <div class="form-col col-md-12">
+                      <label class="form-label">Location</label>
+                      <input class="form-control" name="location" placeholder="Type Location Here">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="form-row">
+                    <div class="form-col col-md-12">
+                      <label class="form-label">Next Testing Month</label>
+                      <select class="form-control" name="nextmonth">
+                        <option value="">Select Month</option>
+                        <option value="January">January</option>
+                        <option value="February">February</option>
+                        <option value="March">March</option>
+                        <option value="April">April</option>
+                        <option value="May">May</option>
+                        <option value="June">June</option>
+                        <option value="July">July</option>
+                        <option value="August">August</option>
+                        <option value="September">September</option>
+                        <option value="October">October</option>
+                        <option value="November">November</option>
+                        <option value="December">December</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="form-row">
+                    <div class="form-col col-md-12">
+                      <label class="form-label">Next Testing Date</label>
+                      <input class="form-control" name="nextdate" type="date" placeholder="Next Testing Date">
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Conditional section -->
+              <div id="conditionalSection" class="conditional-section" style="display: none;">
+                <hr style="border:none; border-top:1px solid #e6ebf0; margin: 8px 0 22px;">
+
+                <div class="form-row">
+                  <div class="form-col col-md-6">
+                    <label class="form-label">Corrective Action</label>
+                    <textarea class="form-control" rows="2" name="caction"
+                      placeholder="Describe the corrective action taken or planned..."></textarea>
+                  </div>
+
+                  <div class="form-col col-md-6">
+                    <label class="form-label">RCA (Root Cause Analysis)</label>
+                    <textarea class="form-control" rows="2" name="rca"
+                      placeholder="Enter root cause analysis findings..."></textarea>
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-col col-md-12">
+                    <label class="form-label">Preventive Action</label>
+                    <textarea class="form-control" rows="2" name="paction"
+                      placeholder="Describe preventive measures to avoid recurrence..."></textarea>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Footer -->
+              <div class="form-footer mt-2">
+                <button type="submit" class="btn btn-primary" name="submit">Submit Report</button>
+              </div>
+
+            </form>
+          </div>
         </div>
-    </div>
-</div>
+      </div>
 
+      <script src="https://code.jquery.com/jquery-3.6.0.min.js">
+      </script>
 
-
-<script>
-    $(document).ready(function() {
-        // Toggle conditional section
-        function toggleConditionalSection() {
+      <script>
+        $(document).ready(function () {
+          function toggleConditionalSection() {
             var selectedValue = $('#reasonSelect').val();
-            if (selectedValue === 'missed_testing' || selectedValue === 'others') {
-                $('#conditionalSection').show();
+            if (selectedValue === 'missed testing' || selectedValue === 'others') {
+              $('#conditionalSection').show();
             } else {
-                $('#conditionalSection').hide();
+              $('#conditionalSection').hide();
             }
+          }
+
+          toggleConditionalSection();
+
+          $('#reasonSelect').on('change', function () {
+            toggleConditionalSection();
+          });
+        });
+      </script>
+
+      <?php
+      if (isset($_POST['submit'])) {
+        $dtime    = mysqli_real_escape_string($con, $_POST['dtime']);
+        $category = mysqli_real_escape_string($con, $_POST['category']);
+        $reason   = mysqli_real_escape_string($con, $_POST['reason']);
+        $caction  = mysqli_real_escape_string($con, $_POST['caction']);
+        $rca      = mysqli_real_escape_string($con, $_POST['rca']);
+        $paction  = mysqli_real_escape_string($con, $_POST['paction']);
+
+        // 1) Insert justification row
+        $insert = mysqli_query($con, "INSERT INTO `tbl_microtrending1`(`eid`, `attempt_on`, `user`, `status`, `category`, `reason`, `caction`, `paction`, `rca`) VALUES ('$mid','$dtime','$user','Justified','$category','$reason','$caction','$paction','$rca')");
+        $insertxid = mysqli_insert_id($con);
+
+        // 2) If user picked a Next Testing Month → create a new row in tbl_microtrending
+        $nextMonth = isset($_POST['nextmonth']) ? trim($_POST['nextmonth']) : '';
+        $nextDate  = isset($_POST['nextdate'])  ? trim($_POST['nextdate'])  : '';
+
+        if (!empty($nextMonth)) {
+          // Convert month name → number
+          $monthNum   = date('m', strtotime($nextMonth));  // "July" → "07"
+          $yearNow    = date('Y');
+          $newAdmonth = $yearNow . '-' . $monthNum;        // "2026-07"
+          $monthValue = (int)$monthNum;                    // "07" → 7 (for the `month` column)
+
+          // Copy fields from the current row
+          $sid   = mysqli_real_escape_string($con, $currentRow['sid']);
+          $midx  = mysqli_real_escape_string($con, $currentRow['mid']);
+          $userx = mysqli_real_escape_string($con, $currentRow['user']);
+          $yearx = mysqli_real_escape_string($con, $currentRow['year']);
+          $freqx = mysqli_real_escape_string($con, $currentRow['frequency']);
+
+          // Insert new month row with `month` and `admonth` both set
+          // print_r("INSERT INTO `tbl_microtrending`
+          //     (`sid`, `mid`, `user`, `admonth`, `month`, `status`, `fstatus`, `year`, `frequency`)
+          //     VALUES ('$sid', '$midx', '$userx', '$newAdmonth', '$monthValue', '', '', '$yearx', '$freqx')");die;
+          mysqli_query($con, "INSERT INTO `tbl_microtrending`
+              (`sid`, `mid`, `user`, `admonth`, `month`, `status`, `fstatus`, `year`, `frequency`)
+              VALUES ('$sid', '$midx', '$userx', '$newAdmonth', '$monthValue', '', '', '$yearx', '$freqx')");
         }
 
-        toggleConditionalSection();
-
-        $('#reasonSelect').on('change', function() {
-            toggleConditionalSection();
-        });
-    });
-</script>
-
-<?php
-if (isset($_POST['submit'])) {
-    $dtime = $_POST['dtime'];
-
-    $category = $_POST['category'];
-    $reason = $_POST['reason'];
-    $caction = $_POST['caction'];
-    $rca = $_POST['rca'];
-    $paction = $_POST['paction'];
-
-
-
-
-
-    $prodx = date('dmYHis') . rand(000, 999);
-
-    $insert = mysqli_query($con, "INSERT INTO `tbl_microtrending1`(`eid`, `attempt_on`, `user`, `status`, `category`, `reason`, `caction`, `paction`, `rca`) VALUES ('$mid','$dtime','$user','Justified','$category','$reason','$caction','$paction','$rca')");
-    $insertxid = mysqli_insert_id($con);
-
-    if ($insert) {
-?>
-        <script>
+        // 3) Redirect as before
+        if ($insert) {
+          ?>
+          <script>
             window.location.href = "admin.php?id=microsign&mid=<?php echo $insertxid; ?>&mid1=<?php echo $mid; ?>";
-        </script>
-
-<?php
-
-    }
-}
-
-
-
-?>
+          </script>
+          <?php
+        }
+      }
+      ?>

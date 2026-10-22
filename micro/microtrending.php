@@ -47,12 +47,12 @@
                       <div class="col-md-12">
                           <a href="admin.php?id=1">
                               <button class="btn btn-success" style="float:right; margin-left:15px">Go Back</button>
-                          </a>
-
-
-                          <a href="admin.php?id=microtrend">
+                          </a> <a href="admin.php?id=microtrend">
                               <button class="btn btn-info" style="float:right; margin-left:15px">Trending</button>
                           </a>
+
+
+
                           <a href="admin.php?id=microtrending&year=<?php echo $nxt; ?>">
                               <button class="btn btn-danger" style="float:right; margin-left:15px">Next Year</button>
                           </a>
@@ -108,6 +108,7 @@
                                                           <td colspan="31" style="color:#FFFFFF; background-color:<?php echo "#389fe8"; ?>;"><?php echo $row['name']; ?></td>
                                                       </tr>
 
+                                                      
                                                       <?php
                                                         $sql1 = mysqli_query($con, "select * from tbl_micortrend1 where sid='$row[id]'");
                                                         while ($row1 = mysqli_fetch_array($sql1)) {
@@ -118,7 +119,9 @@
                                                                       <b>
                                                                           <?php
 
-                                                                            echo $row1['name'];
+                                                                            echo $row1['name']." (".$row1['sampleno'].")";
+                                                                            echo '<br>';
+                                                                            echo 'Location: '.$row['name'].' ';
                                                                             ?>
                                                                       </b>
                                                                   </span>
@@ -144,8 +147,10 @@
                                                                         $tcheck1 = mysqli_num_rows($tcheck);
                                                                         if ($tcheck1 > 0) {
 
-                                                                            $tcheckq = mysqli_fetch_array($tcheck);
+                                                                           while($tcheckq = mysqli_fetch_array($tcheck)){
                                                                             if ($tcheckq['month'] == $mx) {
+
+                                                                           
 
                                                                                 $tcheck1 = mysqli_num_rows($tcheck);
                                                                                 $match1 = $tcheck1;
@@ -179,7 +184,7 @@
                                                                               <?php
                                                                                 } else {
                                                                                     //in waiting
-                                                                                    if ($tcheckq['status'] == 'Pass' || ($tcheckq['status'] == 'Fail' && $tcheckq['fstatus'] == 'No')) {
+                                                                                    if ($tcheckq['status'] == 'Pass' ||($tcheckq['status'] == 'Fail' && $tcheckq['fstatus'] == 'No')) {
                                                                                         $color = "#136207";
                                                                                         $txt = "Done";
                                                                                         $bg = "36, 115, 171";
@@ -200,15 +205,15 @@
                                                                           <?php
                                                                                 }
                                                                             }
+                                                                           }
                                                                             ?>
-
-
 
 
                                                                   </td>
                                                           <?php
                                                                         }
-                                                                    }
+                                                                }
+                                                                    
 
                                                             ?>
 
