@@ -783,9 +783,12 @@ $portallink = $_SESSION['portallink'];
 				} elseif ($_GET['id'] == 'microraise') {
 
 					include 'micro/microraise.php';
-				}elseif ($_GET['id'] == 'microsign') {
+				} elseif ($_GET['id'] == 'microsign') {
 
 					include 'micro/microsign.php';
+				} elseif ($_GET['id'] == 'microjustify') {
+
+					include 'micro/justification.php';
 				}
 				//micro trendi 
 

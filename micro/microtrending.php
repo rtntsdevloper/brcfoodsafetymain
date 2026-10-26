@@ -59,7 +59,9 @@
                           <a href="admin.php?id=microtrending&year=<?php echo $pre; ?>">
                               <button class="btn btn-danger" style="float:right; margin-left:15px">Previous Year</button>
                           </a>
-
+                          <a href="admin.php?id=microjustify">
+                              <button class="btn btn-outline-primary" style="float:right; margin-left:15px">Justification Report</button>
+                          </a>
 
                           <h4 class="card-title mb-2">Micro Trending</h4>
                       </div>
@@ -108,7 +110,6 @@
                                                           <td colspan="31" style="color:#FFFFFF; background-color:<?php echo "#389fe8"; ?>;"><?php echo $row['name']; ?></td>
                                                       </tr>
 
-                                                      
                                                       <?php
                                                         $sql1 = mysqli_query($con, "select * from tbl_micortrend1 where sid='$row[id]'");
                                                         while ($row1 = mysqli_fetch_array($sql1)) {
@@ -120,8 +121,6 @@
                                                                           <?php
 
                                                                             echo $row1['name']." (".$row1['sampleno'].")";
-                                                                            echo '<br>';
-                                                                            echo 'Location: '.$row['name'].' ';
                                                                             ?>
                                                                       </b>
                                                                   </span>
@@ -147,10 +146,8 @@
                                                                         $tcheck1 = mysqli_num_rows($tcheck);
                                                                         if ($tcheck1 > 0) {
 
-                                                                           while($tcheckq = mysqli_fetch_array($tcheck)){
+                                                                            $tcheckq = mysqli_fetch_array($tcheck);
                                                                             if ($tcheckq['month'] == $mx) {
-
-                                                                           
 
                                                                                 $tcheck1 = mysqli_num_rows($tcheck);
                                                                                 $match1 = $tcheck1;
@@ -174,7 +171,6 @@
                                                                                         $txtd = "Pending";
                                                                                     }
                                                                                 ?>
-
                                                                                   <div class="drag details ui-draggable ui-draggable-handle" data-taskid="13956" data-userid="1" style="border-left:5px solid <?php echo $colord; ?>;position:relative;">
                                                                                       <h2 class="details-task" style="background:<?php echo $colord; ?>; color: #FFF"><?php echo $txtd; ?></h3>
                                                                                           <div class="details-uren">
@@ -187,6 +183,10 @@
                                                                                     if ($tcheckq['status'] == 'Pass' ||($tcheckq['status'] == 'Fail' && $tcheckq['fstatus'] == 'No')) {
                                                                                         $color = "#136207";
                                                                                         $txt = "Done";
+                                                                                        $bg = "36, 115, 171";
+                                                                                    } else if ($tcheckq['status'] == 'Justified') {
+                                                                                        $color = "#0D6EFD";
+                                                                                        $txt = "Justified";
                                                                                         $bg = "36, 115, 171";
                                                                                     } else if ($tcheckq['status'] == 'Fail') {
                                                                                         $color = "#EE204D";
@@ -205,15 +205,15 @@
                                                                           <?php
                                                                                 }
                                                                             }
-                                                                           }
                                                                             ?>
+
+
 
 
                                                                   </td>
                                                           <?php
                                                                         }
-                                                                }
-                                                                    
+                                                                    }
 
                                                             ?>
 

@@ -1,7 +1,7 @@
 <?php
 $mid = $_GET['mid'];
 
-$mtxrow = mysqli_query($con,"SELECT * FROM `tbl_microtrending` WHERE id='$mid'");
+$mtxrow = mysqli_query($con, "SELECT * FROM `tbl_microtrending` WHERE id='$mid'");
 $mtxrowd = mysqli_fetch_assoc($mtxrow);
 $mtxrow1 = $mtxrowd['mid'];
 
@@ -34,7 +34,56 @@ $mtxrow1 = $mtxrowd['mid'];
         <div class="container-fluid">
 
 
+            <!-- modal -->
+            <!-- Modal -->
+            <div class="modal fade" id="commentModal" tabindex="-1" role="dialog"
+                aria-labelledby="commentModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
 
+                        <!-- Header -->
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="commentModalLabel">Add Comment</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+
+                        <!-- Body -->
+                        <form id="commentForm" action="micro/retestraise" method="post">
+                            <div class="modal-body">
+
+                                <div class="form-group">
+                                    <label for="comment">Comment</label>
+                                    <textarea class="form-control"
+                                        id="comment"
+                                        name="comment"
+                                        rows="4"
+                                        placeholder="Write your comment..."
+                                        required></textarea>
+
+                                    <input type="hidden" name="mid" value="<?php echo $mid; ?>">
+                                    <input type="hidden" name="userx" value="<?php echo $user; ?>">
+                                </div>
+
+                            </div>
+
+                            <!-- Footer -->
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                    Cancel
+                                </button>
+                                <button type="submit" class="btn btn-success">
+                                    Submit
+                                </button>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- modal end  -->
 
             <div class="col-md-12 mt-5 mb-5">
                 <div class="card">
@@ -46,14 +95,35 @@ $mtxrow1 = $mtxrowd['mid'];
                                 <div class="card-title">Attempt Micro Trending</div>
                             </div>
                             <div class="col-md-6">
-                                
-                                <a href="admin.php?id=microview" class="btn btn-success" style="float: right;">Go Back</a>
 
-                                <a href="admin.php?id=microraise&mid=<?php echo $mid; ?>" class="btn btn-primary mr-2" style="float:right; ">Add Justifiaction</a>
+                                <a href="admin.php?id=microview" class="btn btn-success" style="float: right;">Go Back</a>
+                                <?php
+
+                                ?>
+                                <?php
+                                if ($mtxrowd['fstatus'] == 'Yes') {
+                                ?>
+                                    <button type="button"
+                                        class="btn btn-primary"
+                                        data-toggle="modal"
+                                        data-target="#commentModal" style="float:right; ">
+                                        Add Justification
+                                    </button>
+                                <?php
+                                } else {
+                                ?>
+                                    <a href="admin.php?id=microraise&mid=<?php echo $mid; ?>" class="btn btn-primary mr-2" style="float:right; ">Add Justifiaction</a>
+                                <?php
+                                }
+                                ?>
+
 
                             </div>
                         </div>
-                        
+
+
+
+
                         <form class="needs-validation" novalidate="novalidate" method="post" name="form2" action="" enctype="multipart/form-data">
                             <div class="form-row">
                                 <div class="col-md-6 col-sm-12">
@@ -85,7 +155,7 @@ $mtxrow1 = $mtxrowd['mid'];
                                     </div>
                                 </div>
 
-                                
+
                             </div>
                             <div class="row justify-content-center my-3">
                                 <div class="col-lg-12 col-md-12 col-sm-12">
@@ -162,8 +232,6 @@ $mtxrow1 = $mtxrowd['mid'];
                             </div>
 
                             <script>
-                               
-
                                 (function() {
                                     // DOM elements
                                     const bacteriaSelect = document.getElementById('bacteriaSelect');
@@ -326,13 +394,7 @@ $mtxrow1 = $mtxrowd['mid'];
 
 
                             <div class="row hidden" id="contain">
-                                <div class="col-md-6 col-sm-12 mt-3">
-                                    <label for="validationTooltip01">Corrective action taken</label>
-                                    <textarea class="form-control" name="remark"></textarea>
-                                    <div class="invalid-tooltip">
-                                        Please provide a valid name.
-                                    </div>
-                                </div>
+
                                 <div class="col-md-6 col-sm-12 mt-3">
                                     <label for="validationTooltip01">Is restesting shall be done as corrective action?</label>
                                     <select name="fstatus" id="" class="form-control">
@@ -344,6 +406,13 @@ $mtxrow1 = $mtxrowd['mid'];
 
                                     <div class="invalid-tooltip">
                                         Please provide status.
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-sm-12 mt-3">
+                                    <label for="validationTooltip01">Corrective action taken</label>
+                                    <textarea class="form-control" name="remark"></textarea>
+                                    <div class="invalid-tooltip">
+                                        Please provide a valid name.
                                     </div>
                                 </div>
 
@@ -401,21 +470,20 @@ $mtxrow1 = $mtxrowd['mid'];
 
                 $bact_name = $_POST['bact_name'];
 
-                foreach($bact_name as $key => $value){
+                foreach ($bact_name as $key => $value) {
                     $bactname = $value;
                     $testvalue = $_POST['test_value'][$key];
                     $bactstatus = $_POST['bactstatus'][$key];
                     $acceptl = $_POST['acceptl'][$key];
                     $rejectl = $_POST['rejectl'][$key];
 
-                    $mstiq = mysqli_query($con,"INSERT INTO `microtrendb`(`mmid`, `mid`, `name`, `accept`, `reject`, `actual`, `status`) VALUES ('$mstdx','$mid','$bactname','$acceptl','$rejectl','$testvalue','$bactstatus')");
-                    
+                    $mstiq = mysqli_query($con, "INSERT INTO `microtrendb`(`mmid`, `mid`, `name`, `accept`, `reject`, `actual`, `status`) VALUES ('$mstdx','$mid','$bactname','$acceptl','$rejectl','$testvalue','$bactstatus')");
                 }
 
 
-            
 
-               
+
+
 
 
                 $mstidq = mysqli_query($con, "update tbl_microtrending set status='$status',fstatus='$fsatus' where id='$mid'");
@@ -425,3 +493,17 @@ $mtxrow1 = $mtxrowd['mid'];
                 }
             }
             ?>
+
+
+
+
+            <!-- Button to open modal -->
+
+
+
+            <!-- Modal -->
+
+
+            <!-- jQuery + Bootstrap JS (required for modal) -->
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
